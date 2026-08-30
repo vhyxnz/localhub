@@ -1061,6 +1061,22 @@ button {
         top: max(64px, calc(10px + env(safe-area-inset-top)));
     }
 
+    .viewer .frame-wrapper {
+        position: absolute;
+        top: max(122px, calc(68px + env(safe-area-inset-top)));
+        right: 0;
+        bottom: env(safe-area-inset-bottom);
+        left: 0;
+
+        width: auto;
+        height: auto;
+    }
+
+    .viewer .frame-wrapper.mode-mobile,
+    .viewer .frame-wrapper.mode-adjustable {
+        padding-top: 20px;
+    }
+
     .view-btn {
         width: 30px;
         height: 30px;
@@ -6558,7 +6574,7 @@ loadMusic();
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
         navigator.serviceWorker
-            .register("./sw.js?v=6", { updateViaCache: "none" })
+            .register("./sw.js?v=7", { updateViaCache: "none" })
             .then(registration => registration.update())
             .catch(error => {
                 console.warn("Local Hub service worker was not registered:", error);
