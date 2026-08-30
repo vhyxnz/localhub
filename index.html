@@ -1,11 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- Browser tab icon -->
-<link rel="icon" type="image/x-icon" href="LocalHubLogo.png">
 <meta charset="UTF-8">
 <meta name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#08090d">
+<meta name="application-name" content="Local Hub">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Local Hub">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
   
 <title>LOCAL HUB</title>
 
@@ -97,7 +103,12 @@ body {
     position: relative;
     z-index: 1;
     min-height: 100vh;
-    padding: 24px;
+    min-height: 100dvh;
+    padding:
+        calc(24px + env(safe-area-inset-top))
+        calc(24px + env(safe-area-inset-right))
+        calc(24px + env(safe-area-inset-bottom))
+        calc(24px + env(safe-area-inset-left));
 }
 
 /* =========================
@@ -1099,7 +1110,44 @@ button {
 @media(max-width: 650px) {
 
     .app {
-        padding: 16px;
+        padding:
+            calc(16px + env(safe-area-inset-top))
+            calc(16px + env(safe-area-inset-right))
+            calc(16px + env(safe-area-inset-bottom))
+            calc(16px + env(safe-area-inset-left));
+    }
+
+    .header {
+        gap: 10px;
+    }
+
+    .brand {
+        gap: 9px;
+        min-width: 0;
+    }
+
+    .brand-logo {
+        width: 40px;
+        height: 40px;
+    }
+
+    .brand-text p {
+        display: none;
+    }
+
+    .brand-text h1 {
+        font-size: 17px;
+        white-space: nowrap;
+    }
+
+    .header-actions {
+        gap: 6px;
+    }
+
+    .header-actions .icon-btn {
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
     }
 
     .hero {
@@ -2080,6 +2128,22 @@ body.player-active .app {
 
             <button
                 class="icon-btn"
+                onclick="exportLocalHubData()"
+                title="Export backup"
+                aria-label="Export backup">
+                ⇩
+            </button>
+
+            <button
+                class="icon-btn"
+                onclick="document.getElementById('backupFileInput').click()"
+                title="Import backup"
+                aria-label="Import backup">
+                ⇧
+            </button>
+
+            <button
+                class="icon-btn"
                 onclick="toggleSort()"
                 title="Sort">
                 ↕
@@ -2648,6 +2712,13 @@ body.player-active .app {
     id="toast"
     class="toast">
 </div>
+
+<input
+    id="backupFileInput"
+    type="file"
+    accept="application/json,.json,.localhub"
+    hidden
+    onchange="importLocalHubData(event)">
 
 
 <!-- EXPANDED MUSIC PLAYER -->
@@ -6200,11 +6271,237 @@ document.addEventListener(
 
 
 /* ==========================================
+   BACKUP / RESTORE
+========================================== */
+
+const BACKUP_FORMAT = "local-hub-backup";
+const BACKUP_VERSION = 1;
+
+function dataURLToBlob(dataURL) {
+
+    const parts = dataURL.split(",");
+    const mimeMatch = parts[0].match(/data:([^;]+)/);
+    const bytes = atob(parts[1]);
+    const buffer = new Uint8Array(bytes.length);
+
+    for (let i = 0; i < bytes.length; i++) {
+        buffer[i] = bytes.charCodeAt(i);
+    }
+
+    return new Blob(
+        [buffer],
+        { type: mimeMatch ? mimeMatch[1] : "application/octet-stream" }
+    );
+
+}
+
+function downloadBackupFile(file, fileName) {
+
+    const url = URL.createObjectURL(file);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+}
+
+async function exportLocalHubData() {
+
+    try {
+
+        showToast("Preparing backup…");
+
+        const exportedTracks = [];
+
+        for (const track of tracks) {
+
+            exportedTracks.push({
+                ...track,
+                blob: undefined,
+                audio: track.blob ? await fileToDataURL(track.blob) : "",
+                fileName: track.blob && track.blob.name
+                    ? track.blob.name
+                    : `${track.name || "track"}.audio`,
+                lastModified: track.blob && track.blob.lastModified
+                    ? track.blob.lastModified
+                    : track.added
+            });
+
+        }
+
+        const backup = {
+            format: BACKUP_FORMAT,
+            version: BACKUP_VERSION,
+            exportedAt: new Date().toISOString(),
+            apps,
+            tracks: exportedTracks
+        };
+
+        const date = new Date().toISOString().slice(0, 10);
+        const fileName = `local-hub-backup-${date}.json`;
+        const file = new File(
+            [JSON.stringify(backup)],
+            fileName,
+            { type: "application/json" }
+        );
+
+        if (
+            navigator.share
+            && navigator.canShare
+            && navigator.canShare({ files: [file] })
+        ) {
+
+            try {
+                await navigator.share({
+                    files: [file],
+                    title: "Local Hub Backup"
+                });
+            } catch (error) {
+                if (error && error.name === "AbortError") throw error;
+                downloadBackupFile(file, fileName);
+            }
+
+        } else {
+            downloadBackupFile(file, fileName);
+        }
+
+        showToast("Backup exported.");
+
+    } catch (error) {
+
+        if (error && error.name === "AbortError") {
+            showToast("Export cancelled.");
+            return;
+        }
+
+        console.error(error);
+        showToast("Could not export backup.");
+
+    }
+
+}
+
+async function replaceStoredTracks(importedTracks) {
+
+    if (!musicDB) musicDB = await openMusicDB();
+
+    await new Promise((resolve, reject) => {
+
+        const tx = musicDB.transaction(MUSIC_STORE, "readwrite");
+        const store = tx.objectStore(MUSIC_STORE);
+
+        store.clear();
+        importedTracks.forEach(track => store.put(track));
+
+        tx.oncomplete = resolve;
+        tx.onerror = () => reject(tx.error);
+        tx.onabort = () => reject(tx.error);
+
+    });
+
+}
+
+async function importLocalHubData(event) {
+
+    const input = event.target;
+    const file = input.files && input.files[0];
+    input.value = "";
+
+    if (!file) return;
+
+    try {
+
+        const backup = JSON.parse(await file.text());
+
+        if (
+            backup.format !== BACKUP_FORMAT
+            || backup.version !== BACKUP_VERSION
+            || !Array.isArray(backup.apps)
+            || !Array.isArray(backup.tracks)
+        ) {
+            throw new Error("Unsupported Local Hub backup.");
+        }
+
+        const shouldReplace = confirm(
+            `Replace your current library with this backup?\n\n`
+            + `${backup.apps.length} app${backup.apps.length === 1 ? "" : "s"}, `
+            + `${backup.tracks.length} track${backup.tracks.length === 1 ? "" : "s"}\n\n`
+            + "Export your current data first if you want to keep it."
+        );
+
+        if (!shouldReplace) {
+            showToast("Import cancelled.");
+            return;
+        }
+
+        showToast("Importing backup…");
+
+        const importedTracks = backup.tracks.map(track => {
+
+            const { audio, fileName, lastModified, ...metadata } = track;
+            const blob = audio ? dataURLToBlob(audio) : new Blob([]);
+
+            let audioFile = blob;
+
+            try {
+                audioFile = new File(
+                    [blob],
+                    fileName || `${metadata.name || "track"}.audio`,
+                    {
+                        type: blob.type,
+                        lastModified: lastModified || metadata.added || Date.now()
+                    }
+                );
+            } catch {
+            }
+
+            return { ...metadata, blob: audioFile };
+
+        });
+
+        apps = backup.apps;
+        tracks = importedTracks.sort((a, b) => b.added - a.added);
+
+        await saveApps();
+        await replaceStoredTracks(tracks);
+
+        Object.values(objectUrls).forEach(url => URL.revokeObjectURL(url));
+        objectUrls = {};
+        activeAppGroup = "All";
+        activeMusicGroup = "All";
+
+        renderApps();
+        renderMusicList();
+        showToast("Backup imported successfully.");
+
+    } catch (error) {
+
+        console.error(error);
+        showToast("That file is not a valid Local Hub backup.");
+
+    }
+
+}
+
+
+/* ==========================================
    START
 ========================================== */
 
 loadApps();
 loadMusic();
+
+/* Keep the installed PWA shell available when the iPhone is offline. */
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js").catch(error => {
+            console.warn("Local Hub service worker was not registered:", error);
+        });
+    });
+}
 
 </script>
 
