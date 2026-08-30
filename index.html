@@ -1058,12 +1058,12 @@ button {
 @media(max-width: 650px) {
 
     .viewer-bar {
-        top: 8px;
+        top: 56px;
     }
 
     .viewer .frame-wrapper {
         position: absolute;
-        top: 64px;
+        top: 112px;
         right: 0;
         bottom: 0;
         left: 0;
@@ -4246,7 +4246,7 @@ function resetViewerBarPosition() {
 
     bar.style.left = "50%";
     bar.style.top = window.innerWidth <= 650
-        ? "8px"
+        ? "56px"
         : "calc(12px + env(safe-area-inset-top))";
     bar.style.right = "";
     bar.style.transform = "translateX(-50%)";
@@ -4323,7 +4323,7 @@ function resetViewerBarPosition() {
         const maxLeft = window.innerWidth - rect.width - 6;
         const minTop = Math.max(
             getSafeAreaTop() + 6,
-            6
+            window.innerWidth <= 650 ? 56 : 6
         );
         const maxTop = window.innerHeight - rect.height - 6;
 
@@ -4383,7 +4383,7 @@ function resetViewerBarPosition() {
         const maxLeft = window.innerWidth - rect.width - 6;
         const minTop = Math.max(
             getSafeAreaTop() + 6,
-            6
+            window.innerWidth <= 650 ? 56 : 6
         );
         const maxTop = window.innerHeight - rect.height - 6;
 
@@ -6574,7 +6574,7 @@ loadMusic();
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
         navigator.serviceWorker
-            .register("./sw.js?v=8", { updateViaCache: "none" })
+            .register("./sw.js?v=9", { updateViaCache: "none" })
             .then(registration => registration.update())
             .catch(error => {
                 console.warn("Local Hub service worker was not registered:", error);
