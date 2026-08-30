@@ -1057,6 +1057,10 @@ button {
 
 @media(max-width: 650px) {
 
+    .viewer-bar {
+        top: max(64px, calc(10px + env(safe-area-inset-top)));
+    }
+
     .view-btn {
         width: 30px;
         height: 30px;
@@ -4225,7 +4229,9 @@ function resetViewerBarPosition() {
     if (!bar) return;
 
     bar.style.left = "50%";
-    bar.style.top = "calc(12px + env(safe-area-inset-top))";
+    bar.style.top = window.innerWidth <= 650
+        ? "64px"
+        : "calc(12px + env(safe-area-inset-top))";
     bar.style.right = "";
     bar.style.transform = "translateX(-50%)";
 
@@ -4299,7 +4305,10 @@ function resetViewerBarPosition() {
         let newTop = startTop + (clientY - startY);
 
         const maxLeft = window.innerWidth - rect.width - 6;
-        const minTop = getSafeAreaTop() + 6;
+        const minTop = Math.max(
+            getSafeAreaTop() + 6,
+            window.innerWidth <= 650 ? 64 : 6
+        );
         const maxTop = window.innerHeight - rect.height - 6;
 
         newLeft = Math.min(Math.max(newLeft, 6), Math.max(maxLeft, 6));
@@ -4356,7 +4365,10 @@ function resetViewerBarPosition() {
         const rect = bar.getBoundingClientRect();
 
         const maxLeft = window.innerWidth - rect.width - 6;
-        const minTop = getSafeAreaTop() + 6;
+        const minTop = Math.max(
+            getSafeAreaTop() + 6,
+            window.innerWidth <= 650 ? 64 : 6
+        );
         const maxTop = window.innerHeight - rect.height - 6;
 
         bar.style.left =
@@ -6545,9 +6557,12 @@ loadMusic();
 /* Keep the installed PWA shell available when the iPhone is offline. */
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./sw.js").catch(error => {
-            console.warn("Local Hub service worker was not registered:", error);
-        });
+        navigator.serviceWorker
+            .register("./sw.js?v=6", { updateViaCache: "none" })
+            .then(registration => registration.update())
+            .catch(error => {
+                console.warn("Local Hub service worker was not registered:", error);
+            });
     });
 }
 
