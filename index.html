@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#08090d">
 <meta name="application-name" content="Local Hub">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="Local Hub">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
@@ -1058,14 +1058,14 @@ button {
 @media(max-width: 650px) {
 
     .viewer-bar {
-        top: max(64px, calc(10px + env(safe-area-inset-top)));
+        top: 8px;
     }
 
     .viewer .frame-wrapper {
         position: absolute;
-        top: max(122px, calc(68px + env(safe-area-inset-top)));
+        top: 64px;
         right: 0;
-        bottom: env(safe-area-inset-bottom);
+        bottom: 0;
         left: 0;
 
         width: auto;
@@ -4246,7 +4246,7 @@ function resetViewerBarPosition() {
 
     bar.style.left = "50%";
     bar.style.top = window.innerWidth <= 650
-        ? "64px"
+        ? "8px"
         : "calc(12px + env(safe-area-inset-top))";
     bar.style.right = "";
     bar.style.transform = "translateX(-50%)";
@@ -4323,7 +4323,7 @@ function resetViewerBarPosition() {
         const maxLeft = window.innerWidth - rect.width - 6;
         const minTop = Math.max(
             getSafeAreaTop() + 6,
-            window.innerWidth <= 650 ? 64 : 6
+            6
         );
         const maxTop = window.innerHeight - rect.height - 6;
 
@@ -4383,7 +4383,7 @@ function resetViewerBarPosition() {
         const maxLeft = window.innerWidth - rect.width - 6;
         const minTop = Math.max(
             getSafeAreaTop() + 6,
-            window.innerWidth <= 650 ? 64 : 6
+            6
         );
         const maxTop = window.innerHeight - rect.height - 6;
 
@@ -6574,7 +6574,7 @@ loadMusic();
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
         navigator.serviceWorker
-            .register("./sw.js?v=7", { updateViaCache: "none" })
+            .register("./sw.js?v=8", { updateViaCache: "none" })
             .then(registration => registration.update())
             .catch(error => {
                 console.warn("Local Hub service worker was not registered:", error);

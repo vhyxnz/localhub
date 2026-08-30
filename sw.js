@@ -1,4 +1,4 @@
-const CACHE_NAME = "local-hub-pwa-v7";
+const CACHE_NAME = "local-hub-pwa-v8";
 const APP_SHELL = [
     "./",
     "./index.html",
@@ -31,7 +31,9 @@ self.addEventListener("fetch", event => {
     if (event.request.method !== "GET") return;
 
     event.respondWith(
-        fetch(event.request)
+        fetch(event.request, {
+            cache: event.request.mode === "navigate" ? "no-store" : "default"
+        })
             .then(response => {
                 const copy = response.clone();
                 caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
