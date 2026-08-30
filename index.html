@@ -2481,7 +2481,7 @@ body.music-panel-hidden.player-active .app { padding-bottom: 0; }
             <button class="settings-action" onclick="document.getElementById('appPackageInput').click()">
                 <span>⇧</span><span><b>Import downloaded app</b><small>Choose a .localhub-app file</small></span>
             </button>
-            <input id="appPackageInput" type="file" accept=".localhub-app,application/json" hidden onchange="importDownloadedApp(event)">
+            <input id="appPackageInput" type="file" hidden onchange="importDownloadedApp(event)">
         </div>
 
         <div class="form-group">
@@ -2551,7 +2551,7 @@ body.music-panel-hidden.player-active .app { padding-bottom: 0; }
                 <span>↓</span><span><b>Export Local Hub</b><small>Download all apps, music, and details</small></span>
             </button>
             <button class="settings-action" onclick="document.getElementById('backupFileInput').click()">
-                <span>↑</span><span><b>Import Local Hub</b><small>Restore a Local Hub backup file</small></span>
+                <span>↑</span><span><b>Import Local Hub</b><small>Restore a backup or import a .localhub-app file</small></span>
             </button>
         </div>
         <div class="settings-section">
@@ -2801,7 +2801,6 @@ body.music-panel-hidden.player-active .app { padding-bottom: 0; }
 <input
     id="backupFileInput"
     type="file"
-    accept="application/json,.json,.localhub"
     hidden
     onchange="importLocalHubData(event)">
 
@@ -6636,6 +6635,26 @@ async function importLocalHubData(event) {
     try {
 
         const backup = JSON.parse(await file.text());
+
+        if (
+            backup.format === APP_PACKAGE_FORMAT
+            && backup.version === 1
+            && backup.app
+            && typeof backup.app.html === "string"
+        ) {
+            const imported = {
+                ...backup.app,
+                id: Date.now() + "-" + Math.random().toString(36).slice(2),
+                created: Date.now(),
+                lastOpened: 0
+            };
+            apps.unshift(imported);
+            await saveApps();
+            renderApps();
+            closeSettingsModal();
+            showToast(`Imported "${imported.name}".`);
+            return;
+        }
 
         if (
             backup.format !== BACKUP_FORMAT
