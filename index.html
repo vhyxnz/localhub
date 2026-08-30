@@ -757,7 +757,7 @@ button {
     position: absolute;
     z-index: 10;
 
-    top: 12px;
+    top: calc(12px + env(safe-area-inset-top));
     left: 50%;
 
     transform: translateX(-50%);
@@ -4225,7 +4225,7 @@ function resetViewerBarPosition() {
     if (!bar) return;
 
     bar.style.left = "50%";
-    bar.style.top = "12px";
+    bar.style.top = "calc(12px + env(safe-area-inset-top))";
     bar.style.right = "";
     bar.style.transform = "translateX(-50%)";
 
@@ -4245,6 +4245,24 @@ function resetViewerBarPosition() {
     let startLeft = 0;
     let startTop = 0;
     let activePointerId = null;
+
+    function getSafeAreaTop() {
+
+        const probe = document.createElement("div");
+        probe.style.cssText =
+            "position:fixed;visibility:hidden;pointer-events:none;"
+            + "top:env(safe-area-inset-top);";
+
+        document.body.appendChild(probe);
+
+        const safeTop =
+            parseFloat(getComputedStyle(probe).top) || 0;
+
+        probe.remove();
+
+        return safeTop;
+
+    }
 
     function beginDrag(pointerId, clientX, clientY) {
 
@@ -4281,10 +4299,14 @@ function resetViewerBarPosition() {
         let newTop = startTop + (clientY - startY);
 
         const maxLeft = window.innerWidth - rect.width - 6;
+        const minTop = getSafeAreaTop() + 6;
         const maxTop = window.innerHeight - rect.height - 6;
 
         newLeft = Math.min(Math.max(newLeft, 6), Math.max(maxLeft, 6));
-        newTop = Math.min(Math.max(newTop, 6), Math.max(maxTop, 6));
+        newTop = Math.min(
+            Math.max(newTop, minTop),
+            Math.max(maxTop, minTop)
+        );
 
         bar.style.left = `${newLeft}px`;
         bar.style.top = `${newTop}px`;
@@ -4334,13 +4356,17 @@ function resetViewerBarPosition() {
         const rect = bar.getBoundingClientRect();
 
         const maxLeft = window.innerWidth - rect.width - 6;
+        const minTop = getSafeAreaTop() + 6;
         const maxTop = window.innerHeight - rect.height - 6;
 
         bar.style.left =
             `${Math.min(Math.max(rect.left, 6), Math.max(maxLeft, 6))}px`;
 
         bar.style.top =
-            `${Math.min(Math.max(rect.top, 6), Math.max(maxTop, 6))}px`;
+            `${Math.min(
+                Math.max(rect.top, minTop),
+                Math.max(maxTop, minTop)
+            )}px`;
 
     });
 
