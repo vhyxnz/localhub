@@ -784,6 +784,10 @@ button {
         0 15px 40px rgba(0,0,0,.2);
 
     cursor: grab;
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+    overscroll-behavior: none;
 
     transition:
         background .2s ease,
@@ -2131,7 +2135,7 @@ body.player-active .app {
                 onclick="exportLocalHubData()"
                 title="Export backup"
                 aria-label="Export backup">
-                ▼
+                ⇩
             </button>
 
             <button
@@ -2139,14 +2143,14 @@ body.player-active .app {
                 onclick="document.getElementById('backupFileInput').click()"
                 title="Import backup"
                 aria-label="Import backup">
-                ▲
+                ⇧
             </button>
 
             <button
                 class="icon-btn"
                 onclick="toggleSort()"
                 title="Sort">
-                ⇕
+                ↕
             </button>
 
             <button
@@ -4240,6 +4244,7 @@ function resetViewerBarPosition() {
     let startY = 0;
     let startLeft = 0;
     let startTop = 0;
+    let activePointerId = null;
 
     function beginDrag(pointerId, clientX, clientY) {
 
@@ -4255,9 +4260,14 @@ function resetViewerBarPosition() {
         startTop = rect.top;
 
         dragging = true;
+        activePointerId = pointerId;
 
         bar.classList.add("dragging");
-        bar.setPointerCapture(pointerId);
+
+        try {
+            bar.setPointerCapture(pointerId);
+        } catch {
+        }
 
     }
 
@@ -4284,6 +4294,7 @@ function resetViewerBarPosition() {
     function endDrag() {
 
         dragging = false;
+        activePointerId = null;
         bar.classList.remove("dragging");
 
     }
@@ -4292,18 +4303,29 @@ function resetViewerBarPosition() {
 
         if (e.target.closest("button")) return;
 
+        e.preventDefault();
+
         beginDrag(e.pointerId, e.clientX, e.clientY);
 
     });
 
-    bar.addEventListener("pointermove", e => {
+    window.addEventListener("pointermove", e => {
+
+        if (!dragging || e.pointerId !== activePointerId) return;
+
+        e.preventDefault();
 
         moveDrag(e.clientX, e.clientY);
 
+    }, { passive: false });
+
+    window.addEventListener("pointerup", e => {
+        if (e.pointerId === activePointerId) endDrag();
     });
 
-    bar.addEventListener("pointerup", endDrag);
-    bar.addEventListener("pointercancel", endDrag);
+    window.addEventListener("pointercancel", e => {
+        if (e.pointerId === activePointerId) endDrag();
+    });
 
     window.addEventListener("resize", () => {
 
