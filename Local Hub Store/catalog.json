@@ -7,19 +7,19 @@
     "category": "Games",
     "description": "A polished, fast-paced flying arcade game.",
     "icon": "Local Hub Store/icons/flappy.png?v=1.0.0",
-    "packageUrl": "Local Hub Store/localhub-apps/flappy.localhub-app",
+    "packageUrl": "Local Hub Store/localhub-apps/flappy.localhub-app?v=1.0.0",
     "size": 1799207
   },
   {
     "id": "keyboard-warrior",
     "name": "Keyboard Warrior",
     "developer": "Local Hub Studio",
-    "version": "1.4.1",
+    "version": "1.4.2",
     "category": "Games",
     "description": "Put your typing speed and accuracy to the test.",
-    "icon": "Local Hub Store/icons/keyboard-warrior.png?v=1.4.1",
-    "packageUrl": "Local Hub Store/localhub-apps/keyboard-warrior.localhub-app",
-    "size": 2654903
+    "icon": "Local Hub Store/icons/keyboard-warrior.png?v=1.4.2",
+    "packageUrl": "Local Hub Store/localhub-apps/keyboard-warrior.localhub-app?v=1.4.2",
+    "size": 5500227
   },
   {
     "id": "specter",
@@ -29,18 +29,18 @@
     "category": "Lifestyle",
     "description": "A private personal journal with a focused writing experience.",
     "icon": "Local Hub Store/icons/specter.png?v=1.0.0",
-    "packageUrl": "Local Hub Store/localhub-apps/specter.localhub-app",
+    "packageUrl": "Local Hub Store/localhub-apps/specter.localhub-app?v=1.0.0",
     "size": 904465
   },
   {
     "id": "squish",
     "name": "Squish!",
     "developer": "Local Hub Studio",
-    "version": "1.1.1",
+    "version": "1.1.2",
     "category": "Games",
     "description": "A cheerful random squish test with adorable characters.",
-    "icon": "Local Hub Store/icons/squish.png?v=1.1.1",
-    "packageUrl": "Local Hub Store/localhub-apps/squish.localhub-app",
+    "icon": "Local Hub Store/icons/squish.png?v=1.1.2",
+    "packageUrl": "Local Hub Store/localhub-apps/squish.localhub-app?v=1.1.2",
     "size": 18121767
   },
   {
@@ -51,7 +51,7 @@
     "category": "Finance",
     "description": "A Philippine salary calculator for take-home pay and deductions.",
     "icon": "Local Hub Store/icons/sweldo.png?v=1.0.0",
-    "packageUrl": "Local Hub Store/localhub-apps/sweldo.localhub-app",
+    "packageUrl": "Local Hub Store/localhub-apps/sweldo.localhub-app?v=1.0.0",
     "size": 3470830
   }
 ]
