@@ -8,18 +8,18 @@
     "description": "A polished, fast-paced flying arcade game.",
     "icon": "Local Hub Store/icons/flappy.png",
     "packageUrl": "Local Hub Store/localhub-apps/flappy.localhub-app",
-    "size": 420951
+    "size": 1799207
   },
   {
     "id": "keyboard-warrior",
     "name": "Keyboard Warrior",
     "developer": "Local Hub Studio",
-    "version": "1.4.0",
+    "version": "1.4.1",
     "category": "Games",
     "description": "Put your typing speed and accuracy to the test.",
     "icon": "Local Hub Store/icons/keyboard-warrior.png",
     "packageUrl": "Local Hub Store/localhub-apps/keyboard-warrior.localhub-app",
-    "size": 4641759
+    "size": 2654903
   },
   {
     "id": "specter",
