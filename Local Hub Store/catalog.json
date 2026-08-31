@@ -1,27 +1,5 @@
 [
   {
-    "id": "capypera",
-    "name": "CapyPera",
-    "developer": "Local Hub Studio",
-    "version": "1.0",
-    "category": "Finance",
-    "description": "A calm allowance tracker and savings planner.",
-    "icon": "Local Hub Store/icons/capypera.png",
-    "packageUrl": "Local Hub Store/localhub-apps/capypera.localhub-app",
-    "size": 7590543
-  },
-  {
-    "id": "desktop-civilization",
-    "name": "Desktop Civilization",
-    "developer": "Local Hub Studio",
-    "version": "1.0",
-    "category": "Games",
-    "description": "Build and manage a tiny civilization from your desktop.",
-    "icon": "",
-    "packageUrl": "Local Hub Store/localhub-apps/desktop-civilization.localhub-app",
-    "size": 37313
-  },
-  {
     "id": "flappy",
     "name": "Flappy",
     "developer": "Local Hub Studio",
@@ -42,17 +20,6 @@
     "icon": "Local Hub Store/icons/keyboard-warrior.png",
     "packageUrl": "Local Hub Store/localhub-apps/keyboard-warrior.localhub-app",
     "size": 4641741
-  },
-  {
-    "id": "pocket-planet",
-    "name": "Pocket Planet",
-    "developer": "Local Hub Studio",
-    "version": "1.0",
-    "category": "Lifestyle",
-    "description": "A compact, playful world that lives in your pocket.",
-    "icon": "",
-    "packageUrl": "Local Hub Store/localhub-apps/pocket-planet.localhub-app",
-    "size": 27059
   },
   {
     "id": "specter",

@@ -6,11 +6,8 @@ const output = path.join(__dirname, "localhub-apps");
 const iconOutput = path.join(__dirname, "icons");
 
 const definitions = [
-  { folder: "CapyPera", id: "capypera", name: "CapyPera", category: "Finance", description: "A calm allowance tracker and savings planner.", icon: "CapyPeraM.png" },
-  { folder: "Desktop Civilization", id: "desktop-civilization", name: "Desktop Civilization", category: "Games", description: "Build and manage a tiny civilization from your desktop.", icon: "" },
   { folder: "Flappy", id: "flappy", name: "Flappy", category: "Games", description: "A polished, fast-paced flying arcade game.", icon: "Flappy_Bird_icon.png" },
   { folder: "Keyboard Warrior PWA", id: "keyboard-warrior", name: "Keyboard Warrior", category: "Games", description: "Put your typing speed and accuracy to the test.", icon: "KWLogo-v2.png" },
-  { folder: "Pocket Planet", id: "pocket-planet", name: "Pocket Planet", category: "Lifestyle", description: "A compact, playful world that lives in your pocket.", icon: "" },
   { folder: "Specter", id: "specter", name: "Specter", category: "Lifestyle", description: "A private personal journal with a focused writing experience.", icon: "SpecterIcon.png" },
   { folder: "Squish", id: "squish", name: "Squish!", category: "Games", description: "A cheerful random squish test with adorable characters.", icon: "SquishIcon.png" },
   { folder: "Sweldo", id: "sweldo", name: "Sweldo", category: "Finance", description: "A Philippine salary calculator for take-home pay and deductions.", icon: "SLogo.png" }
