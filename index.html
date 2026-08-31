@@ -3039,6 +3039,8 @@ const APP_DB_NAME = "localHubAppsDB";
 const APP_STORE = "apps";
 const APP_PACKAGE_FORMAT = "local-hub-app";
 const MUSIC_PANEL_PREF = "localHubMusicPanelVisible";
+const BUILT_IN_STORE_ID = "builtin-local-hub-store";
+const BUILT_IN_STORE_URL = "./Local Hub Store/local-hub-store.html";
 
 let apps = [];
 let editingId = null;
@@ -3162,11 +3164,11 @@ function openGroupMenu(event, type, id) {
             onclick="closeGroupMenu(); editApp('${id}');">
             <span>✎ Edit / update</span>
         </button>
-        <button
+        ${record.system ? "" : `<button
             class="group-menu-item danger"
             onclick="closeGroupMenu(); deleteApp('${id}');">
             <span>🗑 Delete app</span>
-        </button>
+        </button>`}
         <div class="group-menu-divider"></div>
     ` : "";
 
@@ -3450,8 +3452,119 @@ async function loadApps() {
 
     }
 
+    await ensureBuiltInStore();
     renderApps();
 }
+
+async function ensureBuiltInStore() {
+
+    try {
+
+        const response = await fetch(BUILT_IN_STORE_URL, { cache: "no-cache" });
+        if (!response.ok) throw new Error("Store could not be loaded.");
+
+        const html = await response.text();
+        const existing = apps.find(app => app.id === BUILT_IN_STORE_ID);
+        const storeApp = {
+            id: BUILT_IN_STORE_ID,
+            name: "Local Hub Store",
+            group: "System",
+            html,
+            icon: "",
+            favorite: true,
+            system: true,
+            created: existing?.created || Date.now(),
+            lastOpened: existing?.lastOpened || 0
+        };
+
+        if (existing) {
+            Object.assign(existing, storeApp);
+        } else {
+            apps.unshift(storeApp);
+        }
+
+        await saveApps();
+
+    } catch (error) {
+        console.warn("Local Hub Store was not installed:", error);
+    }
+
+}
+
+async function installStorePackage(payload) {
+
+    if (
+        !payload
+        || payload.format !== APP_PACKAGE_FORMAT
+        || payload.version !== 1
+        || !payload.app
+        || typeof payload.app.html !== "string"
+        || !payload.app.name
+    ) {
+        throw new Error("Unsupported Local Hub app package.");
+    }
+
+    const packageId = String(payload.app.packageId || payload.app.id || "");
+    const existing = packageId
+        ? apps.find(app => String(app.packageId || "") === packageId)
+        : null;
+    const installed = {
+        ...payload.app,
+        id: existing?.id || Date.now() + "-" + Math.random().toString(36).slice(2),
+        packageId: packageId || undefined,
+        created: existing?.created || Date.now(),
+        lastOpened: existing?.lastOpened || 0,
+        system: false
+    };
+
+    if (existing) {
+        Object.assign(existing, installed);
+    } else {
+        apps.unshift(installed);
+    }
+
+    await saveApps();
+    renderApps();
+    return { id: installed.id, name: installed.name, updated: Boolean(existing) };
+
+}
+
+window.addEventListener("message", async event => {
+
+    const primaryFrame = document.getElementById("appFrame");
+    if (!primaryFrame || event.source !== primaryFrame.contentWindow) return;
+
+    if (event.data?.type === "localhub:list-installed") {
+        event.source.postMessage({
+            type: "localhub:installed-apps",
+            requestId: event.data.requestId,
+            packageIds: apps.map(app => app.packageId).filter(Boolean)
+        }, "*");
+        return;
+    }
+
+    if (event.data?.type !== "localhub:install-package") return;
+
+    try {
+        const result = await installStorePackage(event.data.payload);
+        event.source.postMessage({
+            type: "localhub:install-result",
+            requestId: event.data.requestId,
+            ok: true,
+            ...result
+        }, "*");
+        showToast(`${result.updated ? "Updated" : "Installed"} "${result.name}".`);
+    } catch (error) {
+        event.source.postMessage({
+            type: "localhub:install-result",
+            requestId: event.data.requestId,
+            ok: false,
+            error: error.message
+        }, "*");
+        showToast("That Store package could not be installed.");
+    }
+
+});
 
 
 /* ==========================================
@@ -4691,6 +4804,11 @@ async function deleteApp(id) {
         apps.find(a => a.id === id);
 
     if (!app) return;
+
+    if (app.system) {
+        showToast("System apps stay installed in Local Hub.");
+        return;
+    }
 
 
     const confirmed =
@@ -6741,7 +6859,7 @@ loadMusic();
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
         navigator.serviceWorker
-            .register("./sw.js?v=9", { updateViaCache: "none" })
+            .register("./sw.js?v=12", { updateViaCache: "none" })
             .then(registration => registration.update())
             .catch(error => {
                 console.warn("Local Hub service worker was not registered:", error);

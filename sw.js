@@ -1,4 +1,4 @@
-const CACHE_NAME = "local-hub-pwa-v11";
+const CACHE_NAME = "local-hub-pwa-v12";
 const APP_SHELL = [
     "./",
     "./index.html",
@@ -6,7 +6,10 @@ const APP_SHELL = [
     "./LocalHubLogo.png",
     "./icon-180.png",
     "./icon-192.png",
-    "./icon-512.png"
+    "./icon-512.png",
+    "./Local Hub Store/local-hub-store.html",
+    "./Local Hub Store/catalog.json",
+    "./Local Hub Store/store.js"
 ];
 
 self.addEventListener("install", event => {
