@@ -4063,7 +4063,11 @@ function renderApps() {
                 </div>
 
                 <div class="app-info">
-                    LOCAL HTML APP
+                    ${app.version
+                        ? `VERSION ${escapeHTML(app.version)}`
+                        : app.system
+                            ? "SYSTEM APP"
+                            : "LOCAL HTML APP"}
                 </div>
 
 
