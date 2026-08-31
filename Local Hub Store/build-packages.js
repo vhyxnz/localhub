@@ -7,9 +7,9 @@ const iconOutput = path.join(__dirname, "icons");
 
 const definitions = [
   { folder: "Flappy", id: "flappy", name: "Flappy", version: "1.0.0", category: "Games", description: "A polished, fast-paced flying arcade game.", icon: "Flappy_Bird_icon.png" },
-  { folder: "Keyboard Warrior PWA", id: "keyboard-warrior", name: "Keyboard Warrior", version: "1.4.1", category: "Games", description: "Put your typing speed and accuracy to the test.", icon: "icon-180.png" },
+  { folder: "Keyboard Warrior PWA", id: "keyboard-warrior", name: "Keyboard Warrior", version: "1.4.2", category: "Games", description: "Put your typing speed and accuracy to the test.", icon: "icon-180.png" },
   { folder: "Specter", id: "specter", name: "Specter", version: "1.0.0", category: "Lifestyle", description: "A private personal journal with a focused writing experience.", icon: "SpecterIcon.png" },
-  { folder: "Squish", id: "squish", name: "Squish!", version: "1.1.1", category: "Games", description: "A cheerful random squish test with adorable characters.", icon: "SquishIcon.png" },
+  { folder: "Squish", id: "squish", name: "Squish!", version: "1.1.2", category: "Games", description: "A cheerful random squish test with adorable characters.", icon: "SquishIcon.png" },
   { folder: "Sweldo", id: "sweldo", name: "Sweldo", version: "1.0.0", category: "Finance", description: "A Philippine salary calculator for take-home pay and deductions.", icon: "SLogo.png" }
 ];
 
@@ -72,7 +72,7 @@ const catalog = definitions.map(definition => {
     category: definition.category,
     description: definition.description,
     icon: iconUrl,
-    packageUrl: `Local Hub Store/localhub-apps/${fileName}`,
+    packageUrl: `Local Hub Store/localhub-apps/${fileName}?v=${encodeURIComponent(definition.version)}`,
     size: fs.statSync(path.join(output, fileName)).size
   };
 });
