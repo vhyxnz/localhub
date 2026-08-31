@@ -3,55 +3,55 @@
     "id": "flappy",
     "name": "Flappy",
     "developer": "Local Hub Studio",
-    "version": "1.0",
+    "version": "1.0.0",
     "category": "Games",
     "description": "A polished, fast-paced flying arcade game.",
     "icon": "Local Hub Store/icons/flappy.png",
     "packageUrl": "Local Hub Store/localhub-apps/flappy.localhub-app",
-    "size": 420933
+    "size": 420951
   },
   {
     "id": "keyboard-warrior",
     "name": "Keyboard Warrior",
     "developer": "Local Hub Studio",
-    "version": "1.0",
+    "version": "1.4.0",
     "category": "Games",
     "description": "Put your typing speed and accuracy to the test.",
     "icon": "Local Hub Store/icons/keyboard-warrior.png",
     "packageUrl": "Local Hub Store/localhub-apps/keyboard-warrior.localhub-app",
-    "size": 4641741
+    "size": 4641759
   },
   {
     "id": "specter",
     "name": "Specter",
     "developer": "Local Hub Studio",
-    "version": "1.0",
+    "version": "1.0.0",
     "category": "Lifestyle",
     "description": "A private personal journal with a focused writing experience.",
     "icon": "Local Hub Store/icons/specter.png",
     "packageUrl": "Local Hub Store/localhub-apps/specter.localhub-app",
-    "size": 904447
+    "size": 904465
   },
   {
     "id": "squish",
     "name": "Squish!",
     "developer": "Local Hub Studio",
-    "version": "1.0",
+    "version": "1.1.0",
     "category": "Games",
     "description": "A cheerful random squish test with adorable characters.",
     "icon": "Local Hub Store/icons/squish.png",
     "packageUrl": "Local Hub Store/localhub-apps/squish.localhub-app",
-    "size": 18121749
+    "size": 18121767
   },
   {
     "id": "sweldo",
     "name": "Sweldo",
     "developer": "Local Hub Studio",
-    "version": "1.0",
+    "version": "1.0.0",
     "category": "Finance",
     "description": "A Philippine salary calculator for take-home pay and deductions.",
     "icon": "Local Hub Store/icons/sweldo.png",
     "packageUrl": "Local Hub Store/localhub-apps/sweldo.localhub-app",
-    "size": 3470812
+    "size": 3470830
   }
 ]
