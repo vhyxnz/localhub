@@ -3041,6 +3041,7 @@ const APP_PACKAGE_FORMAT = "local-hub-app";
 const MUSIC_PANEL_PREF = "localHubMusicPanelVisible";
 const BUILT_IN_STORE_ID = "builtin-local-hub-store";
 const BUILT_IN_STORE_URL = "./Local Hub Store/local-hub-store.html";
+const BUILT_IN_STORE_ICON_URL = "./Local Hub Store/StoreLogo.png?v=14";
 
 let apps = [];
 let editingId = null;
@@ -3470,7 +3471,7 @@ async function ensureBuiltInStore() {
             name: "Local Hub Store",
             group: "System",
             html,
-            icon: "",
+            icon: BUILT_IN_STORE_ICON_URL,
             favorite: true,
             system: true,
             created: existing?.created || Date.now(),
@@ -6879,7 +6880,7 @@ loadMusic();
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
         navigator.serviceWorker
-            .register("./sw.js?v=13", { updateViaCache: "none" })
+            .register("./sw.js?v=14", { updateViaCache: "none" })
             .then(registration => registration.update())
             .catch(error => {
                 console.warn("Local Hub service worker was not registered:", error);
