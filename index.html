@@ -3538,7 +3538,10 @@ window.addEventListener("message", async event => {
         event.source.postMessage({
             type: "localhub:installed-apps",
             requestId: event.data.requestId,
-            packageIds: apps.map(app => app.packageId).filter(Boolean)
+            packageIds: apps.map(app => app.packageId).filter(Boolean),
+            apps: apps
+                .filter(app => app.packageId)
+                .map(app => ({ packageId: app.packageId, version: app.version || "0.0.0" }))
         }, "*");
         return;
     }
