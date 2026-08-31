@@ -6,11 +6,11 @@ const output = path.join(__dirname, "localhub-apps");
 const iconOutput = path.join(__dirname, "icons");
 
 const definitions = [
-  { folder: "Flappy", id: "flappy", name: "Flappy", category: "Games", description: "A polished, fast-paced flying arcade game.", icon: "Flappy_Bird_icon.png" },
-  { folder: "Keyboard Warrior PWA", id: "keyboard-warrior", name: "Keyboard Warrior", category: "Games", description: "Put your typing speed and accuracy to the test.", icon: "KWLogo-v2.png" },
-  { folder: "Specter", id: "specter", name: "Specter", category: "Lifestyle", description: "A private personal journal with a focused writing experience.", icon: "SpecterIcon.png" },
-  { folder: "Squish", id: "squish", name: "Squish!", category: "Games", description: "A cheerful random squish test with adorable characters.", icon: "SquishIcon.png" },
-  { folder: "Sweldo", id: "sweldo", name: "Sweldo", category: "Finance", description: "A Philippine salary calculator for take-home pay and deductions.", icon: "SLogo.png" }
+  { folder: "Flappy", id: "flappy", name: "Flappy", version: "1.0.0", category: "Games", description: "A polished, fast-paced flying arcade game.", icon: "Flappy_Bird_icon.png" },
+  { folder: "Keyboard Warrior PWA", id: "keyboard-warrior", name: "Keyboard Warrior", version: "1.4.0", category: "Games", description: "Put your typing speed and accuracy to the test.", icon: "KWLogo-v2.png" },
+  { folder: "Specter", id: "specter", name: "Specter", version: "1.0.0", category: "Lifestyle", description: "A private personal journal with a focused writing experience.", icon: "SpecterIcon.png" },
+  { folder: "Squish", id: "squish", name: "Squish!", version: "1.1.0", category: "Games", description: "A cheerful random squish test with adorable characters.", icon: "SquishIcon.png" },
+  { folder: "Sweldo", id: "sweldo", name: "Sweldo", version: "1.0.0", category: "Finance", description: "A Philippine salary calculator for take-home pay and deductions.", icon: "SLogo.png" }
 ];
 
 const mime = ext => ({
@@ -48,6 +48,7 @@ const catalog = definitions.map(definition => {
   const app = {
     packageId: definition.id,
     name: definition.name,
+    version: definition.version,
     group: definition.category,
     html,
     icon,
@@ -67,7 +68,7 @@ const catalog = definitions.map(definition => {
     id: definition.id,
     name: definition.name,
     developer: "Local Hub Studio",
-    version: "1.0",
+    version: definition.version,
     category: definition.category,
     description: definition.description,
     icon: iconUrl,
