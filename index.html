@@ -3505,9 +3505,18 @@ async function installStorePackage(payload) {
     }
 
     const packageId = String(payload.app.packageId || payload.app.id || "");
-    const existing = packageId
-        ? apps.find(app => String(app.packageId || "") === packageId)
-        : null;
+    const normaliseAppName = value => String(value || "")
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "");
+    const existing = (
+        packageId
+            ? apps.find(app => String(app.packageId || "") === packageId)
+            : null
+    ) || apps.find(app =>
+        !app.system
+        && normaliseAppName(app.name) === normaliseAppName(payload.app.name)
+    );
     const installed = {
         ...payload.app,
         id: existing?.id || Date.now() + "-" + Math.random().toString(36).slice(2),
@@ -3540,8 +3549,12 @@ window.addEventListener("message", async event => {
             requestId: event.data.requestId,
             packageIds: apps.map(app => app.packageId).filter(Boolean),
             apps: apps
-                .filter(app => app.packageId)
-                .map(app => ({ packageId: app.packageId, version: app.version || "0.0.0" }))
+                .filter(app => !app.system)
+                .map(app => ({
+                    packageId: app.packageId || "",
+                    name: app.name || "",
+                    version: app.version || "0.0.0"
+                }))
         }, "*");
         return;
     }
