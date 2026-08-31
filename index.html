@@ -758,22 +758,21 @@ button {
     z-index: 10;
 
     top: calc(12px + env(safe-area-inset-top));
-    left: 50%;
+    bottom: calc(12px + env(safe-area-inset-bottom));
+    left: calc(10px + env(safe-area-inset-left));
 
-    transform: translateX(-50%);
+    width: 184px;
+    max-height: 420px;
+    overflow: visible;
 
-    max-width: calc(100vw - 20px);
-    overflow-x: auto;
-
-    height: 48px;
-
-    padding: 0 7px 0 15px;
+    padding: 10px;
 
     border-radius: 15px;
 
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
 
     background: rgba(15,16,22,.28);
     border: 1px solid rgba(255,255,255,.1);
@@ -783,17 +782,41 @@ button {
     box-shadow:
         0 15px 40px rgba(0,0,0,.2);
 
-    cursor: grab;
-    touch-action: none;
     -webkit-user-select: none;
     user-select: none;
-    overscroll-behavior: none;
 
     transition:
+        width .22s ease,
+        padding .22s ease,
         background .2s ease,
         box-shadow .2s ease,
         border-color .2s ease;
 }
+
+.viewer-bar.collapsed {
+    width: 46px;
+    height: 46px;
+    padding: 5px;
+}
+
+.viewer-bar.collapsed > :not(.viewer-sidebar-toggle) { display: none; }
+
+.viewer-sidebar-toggle {
+    width: 36px;
+    height: 36px;
+    flex: 0 0 auto;
+    border-radius: 10px;
+    background: rgba(255,255,255,.1);
+    color: var(--text);
+    font-size: 18px;
+}
+
+.viewer-sidebar-toggle span {
+    display: inline-block;
+    transition: transform .22s ease;
+}
+
+.viewer-bar:not(.collapsed) .viewer-sidebar-toggle span { transform: rotate(180deg); }
 
 .viewer-bar:hover {
     background: rgba(15,16,22,.82);
@@ -802,22 +825,8 @@ button {
         0 15px 40px rgba(0,0,0,.35);
 }
 
-.viewer-bar.dragging {
-    cursor: grabbing;
-
-    background: rgba(15,16,22,.9);
-
-    border-color: rgba(139,92,246,.4);
-
-    box-shadow:
-        0 20px 50px rgba(0,0,0,.45);
-
-    transition: none;
-    user-select: none;
-}
-
 .viewer-title {
-    max-width: 200px;
+    width: 100%;
 
     white-space: nowrap;
     overflow: hidden;
@@ -825,10 +834,12 @@ button {
 
     font-size: 13px;
     font-weight: 700;
+    text-align: center;
+    padding: 3px 5px 7px;
 }
 
 .viewer-close {
-    width: 35px;
+    width: 100%;
     height: 35px;
 
     border-radius: 10px;
@@ -842,6 +853,9 @@ button {
 
 .view-toggle {
     display: flex;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
     gap: 3px;
 
     padding: 4px;
@@ -1058,23 +1072,20 @@ button {
 @media(max-width: 650px) {
 
     .viewer-bar {
-        top: 56px;
+        top: calc(10px + env(safe-area-inset-top));
+        bottom: auto;
+        left: calc(8px + env(safe-area-inset-left));
+        max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 20px);
     }
 
     .viewer .frame-wrapper {
-        position: absolute;
-        top: 112px;
-        right: 0;
-        bottom: 0;
-        left: 0;
-
-        width: auto;
-        height: auto;
+        width: 100%;
+        height: 100%;
     }
 
     .viewer .frame-wrapper.mode-mobile,
     .viewer .frame-wrapper.mode-adjustable {
-        padding-top: 20px;
+        padding: calc(12px + env(safe-area-inset-top)) 12px calc(12px + env(safe-area-inset-bottom));
     }
 
     .view-btn {
@@ -2673,7 +2684,17 @@ body.music-panel-hidden.player-active .app { padding-bottom: 0; }
 
     <div
         id="viewerBar"
-        class="viewer-bar">
+        class="viewer-bar collapsed">
+
+        <button
+            id="viewerSidebarToggle"
+            class="viewer-sidebar-toggle"
+            onclick="toggleViewerSidebar()"
+            aria-label="Open app controls"
+            aria-expanded="false"
+            title="Open app controls">
+            <span>›</span>
+        </button>
 
         <div
             id="viewerTitle"
@@ -4487,7 +4508,7 @@ document.addEventListener("click", event => {
 
 
 /* ==========================================
-   VIEWER BAR — DRAG TO MOVE
+   VIEWER CONTROLS SIDEBAR
 ========================================== */
 
 function resetViewerBarPosition() {
@@ -4497,161 +4518,35 @@ function resetViewerBarPosition() {
 
     if (!bar) return;
 
-    bar.style.left = "50%";
-    bar.style.top = window.innerWidth <= 650
-        ? "56px"
-        : "calc(12px + env(safe-area-inset-top))";
-    bar.style.right = "";
-    bar.style.transform = "translateX(-50%)";
+    bar.classList.add("collapsed");
+    updateViewerSidebarToggle();
 
 }
 
 
-(function setupViewerBarDrag() {
+function toggleViewerSidebar() {
 
-    const bar =
-        document.getElementById("viewerBar");
-
+    const bar = document.getElementById("viewerBar");
     if (!bar) return;
 
-    let dragging = false;
-    let startX = 0;
-    let startY = 0;
-    let startLeft = 0;
-    let startTop = 0;
-    let activePointerId = null;
+    bar.classList.toggle("collapsed");
+    updateViewerSidebarToggle();
+    closeSplitPicker();
 
-    function getSafeAreaTop() {
+}
 
-        const probe = document.createElement("div");
-        probe.style.cssText =
-            "position:fixed;visibility:hidden;pointer-events:none;"
-            + "top:env(safe-area-inset-top);";
+function updateViewerSidebarToggle() {
 
-        document.body.appendChild(probe);
+    const bar = document.getElementById("viewerBar");
+    const toggle = document.getElementById("viewerSidebarToggle");
+    if (!bar || !toggle) return;
 
-        const safeTop =
-            parseFloat(getComputedStyle(probe).top) || 0;
+    const isOpen = !bar.classList.contains("collapsed");
+    toggle.setAttribute("aria-expanded", String(isOpen));
+    toggle.setAttribute("aria-label", isOpen ? "Close app controls" : "Open app controls");
+    toggle.title = isOpen ? "Close app controls" : "Open app controls";
 
-        probe.remove();
-
-        return safeTop;
-
-    }
-
-    function beginDrag(pointerId, clientX, clientY) {
-
-        const rect = bar.getBoundingClientRect();
-
-        bar.style.left = `${rect.left}px`;
-        bar.style.top = `${rect.top}px`;
-        bar.style.transform = "none";
-
-        startX = clientX;
-        startY = clientY;
-        startLeft = rect.left;
-        startTop = rect.top;
-
-        dragging = true;
-        activePointerId = pointerId;
-
-        bar.classList.add("dragging");
-
-        try {
-            bar.setPointerCapture(pointerId);
-        } catch {
-        }
-
-    }
-
-    function moveDrag(clientX, clientY) {
-
-        if (!dragging) return;
-
-        const rect = bar.getBoundingClientRect();
-
-        let newLeft = startLeft + (clientX - startX);
-        let newTop = startTop + (clientY - startY);
-
-        const maxLeft = window.innerWidth - rect.width - 6;
-        const minTop = Math.max(
-            getSafeAreaTop() + 6,
-            window.innerWidth <= 650 ? 56 : 6
-        );
-        const maxTop = window.innerHeight - rect.height - 6;
-
-        newLeft = Math.min(Math.max(newLeft, 6), Math.max(maxLeft, 6));
-        newTop = Math.min(
-            Math.max(newTop, minTop),
-            Math.max(maxTop, minTop)
-        );
-
-        bar.style.left = `${newLeft}px`;
-        bar.style.top = `${newTop}px`;
-
-    }
-
-    function endDrag() {
-
-        dragging = false;
-        activePointerId = null;
-        bar.classList.remove("dragging");
-
-    }
-
-    bar.addEventListener("pointerdown", e => {
-
-        if (e.target.closest("button")) return;
-
-        e.preventDefault();
-
-        beginDrag(e.pointerId, e.clientX, e.clientY);
-
-    });
-
-    window.addEventListener("pointermove", e => {
-
-        if (!dragging || e.pointerId !== activePointerId) return;
-
-        e.preventDefault();
-
-        moveDrag(e.clientX, e.clientY);
-
-    }, { passive: false });
-
-    window.addEventListener("pointerup", e => {
-        if (e.pointerId === activePointerId) endDrag();
-    });
-
-    window.addEventListener("pointercancel", e => {
-        if (e.pointerId === activePointerId) endDrag();
-    });
-
-    window.addEventListener("resize", () => {
-
-        if (bar.style.transform !== "none") return;
-
-        const rect = bar.getBoundingClientRect();
-
-        const maxLeft = window.innerWidth - rect.width - 6;
-        const minTop = Math.max(
-            getSafeAreaTop() + 6,
-            window.innerWidth <= 650 ? 56 : 6
-        );
-        const maxTop = window.innerHeight - rect.height - 6;
-
-        bar.style.left =
-            `${Math.min(Math.max(rect.left, 6), Math.max(maxLeft, 6))}px`;
-
-        bar.style.top =
-            `${Math.min(
-                Math.max(rect.top, minTop),
-                Math.max(maxTop, minTop)
-            )}px`;
-
-    });
-
-})();
+}
 
 
 /* ==========================================
@@ -6880,7 +6775,7 @@ loadMusic();
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
         navigator.serviceWorker
-            .register("./sw.js?v=14", { updateViaCache: "none" })
+            .register("./sw.js?v=15", { updateViaCache: "none" })
             .then(registration => registration.update())
             .catch(error => {
                 console.warn("Local Hub service worker was not registered:", error);
