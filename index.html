@@ -757,30 +757,32 @@ button {
     position: absolute;
     z-index: 10;
 
-    top: calc(12px + env(safe-area-inset-top));
-    bottom: calc(12px + env(safe-area-inset-bottom));
-    left: calc(10px + env(safe-area-inset-left));
+    top: auto;
+    right: calc(14px + env(safe-area-inset-right));
+    bottom: calc(88px + env(safe-area-inset-bottom));
+    left: auto;
 
-    width: 138px;
-    max-height: 280px;
+    width: 224px;
+    max-height: 360px;
     overflow: visible;
 
-    padding: 7px;
+    padding: 12px;
 
-    border-radius: 15px;
+    border-radius: 26px;
 
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
+    gap: 10px;
 
-    background: rgba(15,16,22,.28);
-    border: 1px solid rgba(255,255,255,.1);
+    background: rgba(18,18,25,.9);
+    border: 1px solid rgba(255,255,255,.16);
 
-    backdrop-filter: blur(14px);
+    backdrop-filter: blur(22px) saturate(150%);
 
     box-shadow:
-        0 15px 40px rgba(0,0,0,.2);
+        0 18px 55px rgba(0,0,0,.42),
+        inset 0 1px rgba(255,255,255,.08);
 
     -webkit-user-select: none;
     user-select: none;
@@ -788,38 +790,43 @@ button {
 
     transition:
         width .22s ease,
+        height .22s ease,
         padding .22s ease,
+        border-radius .22s ease,
         background .2s ease,
         box-shadow .2s ease,
         border-color .2s ease;
 }
 
 .viewer-bar.collapsed {
-    width: 46px;
-    height: 46px;
-    padding: 5px;
+    width: 60px;
+    height: 60px;
+    padding: 6px;
+    border-radius: 50%;
+    background: rgba(20,20,27,.78);
 }
 
 .viewer-bar.collapsed > :not(.viewer-sidebar-toggle) { display: none; }
 
 .viewer-sidebar-toggle {
-    width: 36px;
-    height: 36px;
+    width: 48px;
+    height: 48px;
     flex: 0 0 auto;
-    border-radius: 10px;
-    background: rgba(255,255,255,.1);
+    border-radius: 50%;
+    background: linear-gradient(145deg, rgba(151,112,255,.98), rgba(93,65,224,.98));
     color: var(--text);
-    font-size: 18px;
+    font-size: 20px;
     border: 1px solid rgba(255,255,255,.08);
-    box-shadow: inset 0 1px rgba(255,255,255,.08);
+    box-shadow: 0 7px 18px rgba(93,65,224,.38), inset 0 1px rgba(255,255,255,.28);
+    cursor: grab;
+    touch-action: none;
 }
 
-.viewer-sidebar-toggle span {
-    display: inline-block;
-    transition: transform .22s ease;
-}
-
-.viewer-bar:not(.collapsed) .viewer-sidebar-toggle span { transform: rotate(180deg); }
+.viewer-sidebar-toggle span { display: grid; grid-template-columns: repeat(2,5px); gap: 4px; }
+.viewer-sidebar-toggle span::before,
+.viewer-sidebar-toggle span::after { content: ""; width: 5px; height: 5px; border-radius: 50%; background: white; box-shadow: 9px 0 white, 0 9px white, 9px 9px white; }
+.viewer-sidebar-toggle span::after { display: none; }
+.viewer-bar.dragging .viewer-sidebar-toggle { cursor: grabbing; transform: scale(.96); }
 
 .viewer-bar:hover {
     background: rgba(15,16,22,.82);
@@ -837,16 +844,14 @@ button {
 
     font-size: 11px;
     font-weight: 700;
-    text-align: left;
-    padding: 3px 5px;
+    text-align: center;
+    padding: 2px 8px 5px;
     color: #d9dcec;
-    cursor: grab;
+    cursor: default;
 }
 
 .viewer-title::before {
-    content: "⠿";
-    margin-right: 6px;
-    color: var(--muted);
+    content: none;
 }
 
 .viewer-bar.dragging .viewer-title { cursor: grabbing; }
@@ -855,14 +860,14 @@ button {
     width: 100%;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 4px;
+    gap: 8px;
 }
 
 .viewer-close {
     width: 100%;
-    height: 30px;
+    height: 42px;
 
-    border-radius: 10px;
+    border-radius: 14px;
 
     background: rgba(239,68,68,.1);
     color: #fda4af;
@@ -883,32 +888,42 @@ button {
     display: grid;
     width: 100%;
     grid-template-columns: repeat(3, 1fr);
-    gap: 4px;
+    gap: 8px;
 
-    padding: 3px;
-    border-radius: 11px;
+    padding: 5px;
+    border-radius: 16px;
 
     background: rgba(255,255,255,.04);
 }
 
 .view-btn {
     width: 100%;
-    height: 31px;
+    height: 52px;
 
-    border-radius: 8px;
+    border-radius: 13px;
 
     background: rgba(255,255,255,.035);
     color: var(--muted);
 
-    font-size: 13px;
+    font-size: 17px;
 
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-direction: column;
+    gap: 2px;
 
     transition:
         background .2s ease,
         color .2s ease;
+}
+
+.view-btn[data-label]::after {
+    content: attr(data-label);
+    font-size: 8px;
+    font-weight: 750;
+    letter-spacing: .02em;
+    color: currentColor;
 }
 
 .view-btn:hover {
@@ -1099,9 +1114,10 @@ button {
 @media(max-width: 650px) {
 
     .viewer-bar {
-        top: calc(10px + env(safe-area-inset-top));
-        bottom: auto;
-        left: calc(8px + env(safe-area-inset-left));
+        top: auto;
+        right: calc(10px + env(safe-area-inset-right));
+        bottom: calc(82px + env(safe-area-inset-bottom));
+        left: auto;
         max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 20px);
     }
 
@@ -1115,7 +1131,7 @@ button {
         padding: calc(12px + env(safe-area-inset-top)) 12px calc(12px + env(safe-area-inset-bottom));
     }
 
-    .view-btn { height: 30px; font-size: 12px; }
+    .view-btn { height: 52px; font-size: 17px; }
 
 }
 
@@ -2712,11 +2728,11 @@ body.music-panel-hidden.player-active .app { padding-bottom: 0; }
         <button
             id="viewerSidebarToggle"
             class="viewer-sidebar-toggle"
-            onclick="toggleViewerSidebar()"
+            onclick="toggleViewerSidebar(event)"
             aria-label="Open app controls"
             aria-expanded="false"
             title="Open app controls">
-            <span>›</span>
+            <span aria-hidden="true"></span>
         </button>
 
         <div
@@ -2731,6 +2747,7 @@ body.music-panel-hidden.player-active .app { padding-bottom: 0; }
             <button
                 class="view-btn"
                 data-mode="desktop"
+                data-label="Desktop"
                 onclick="setViewMode('desktop')"
                 title="Desktop view">
                 🖥️
@@ -2739,6 +2756,7 @@ body.music-panel-hidden.player-active .app { padding-bottom: 0; }
             <button
                 class="view-btn"
                 data-mode="mobile"
+                data-label="Phone"
                 onclick="setViewMode('mobile')"
                 title="Mobile view">
                 📱
@@ -2747,6 +2765,7 @@ body.music-panel-hidden.player-active .app { padding-bottom: 0; }
             <button
                 class="view-btn"
                 data-mode="adjustable"
+                data-label="Resize"
                 onclick="setViewMode('adjustable')"
                 title="Adjustable view (drag corner to resize)">
                 ⤢
@@ -2755,9 +2774,9 @@ body.music-panel-hidden.player-active .app { padding-bottom: 0; }
         </div>
 
         <div class="viewer-actions">
-            <button id="splitViewBtn" class="view-btn" onclick="openSplitPicker(event)"
+            <button id="splitViewBtn" class="view-btn" data-label="Split" onclick="openSplitPicker(event)"
                 title="Split view with another app" aria-label="Split view">⊞</button>
-            <button id="musicOverlayBtn" class="view-btn active" onclick="toggleMusicOverlay()"
+            <button id="musicOverlayBtn" class="view-btn active" data-label="Music" onclick="toggleMusicOverlay()"
                 title="Toggle music player overlay" aria-label="Toggle music player">♫</button>
         </div>
 
@@ -4535,25 +4554,72 @@ function resetViewerBarPosition() {
 
     if (!bar) return;
 
-    bar.style.left = "";
-    bar.style.top = "";
-    bar.style.right = "";
-    bar.style.bottom = "";
     bar.classList.add("collapsed");
     updateViewerSidebarToggle();
+
+    try {
+        const saved = JSON.parse(localStorage.getItem("localHubAssistivePosition"));
+        if (saved && Number.isFinite(saved.x) && Number.isFinite(saved.y)) {
+            bar.style.left = `${saved.x * window.innerWidth}px`;
+            bar.style.top = `${saved.y * window.innerHeight}px`;
+            bar.style.right = "auto";
+            bar.style.bottom = "auto";
+            requestAnimationFrame(() => keepViewerBarOnScreen(false));
+            return;
+        }
+    } catch {}
+
+    bar.style.left = "auto";
+    bar.style.top = "auto";
+    bar.style.right = "calc(14px + env(safe-area-inset-right))";
+    bar.style.bottom = "calc(88px + env(safe-area-inset-bottom))";
 
 }
 
 
-function toggleViewerSidebar() {
+function toggleViewerSidebar(event) {
 
     const bar = document.getElementById("viewerBar");
     if (!bar) return;
 
+    if (bar.dataset.justDragged === "true") {
+        bar.dataset.justDragged = "false";
+        event?.preventDefault();
+        return;
+    }
+
     bar.classList.toggle("collapsed");
     updateViewerSidebarToggle();
     closeSplitPicker();
+    requestAnimationFrame(() => keepViewerBarOnScreen(false));
+    setTimeout(() => keepViewerBarOnScreen(false), 260);
 
+}
+
+function keepViewerBarOnScreen(snapToEdge = false) {
+    const bar = document.getElementById("viewerBar");
+    if (!bar) return;
+    const rect = bar.getBoundingClientRect();
+    const gap = 10;
+    let left = Math.min(Math.max(rect.left, gap), Math.max(gap, window.innerWidth - rect.width - gap));
+    const top = Math.min(Math.max(rect.top, gap), Math.max(gap, window.innerHeight - rect.height - gap));
+
+    if (snapToEdge) {
+        const center = left + rect.width / 2;
+        left = center < window.innerWidth / 2 ? gap : window.innerWidth - rect.width - gap;
+    }
+
+    bar.style.left = `${left}px`;
+    bar.style.top = `${top}px`;
+    bar.style.right = "auto";
+    bar.style.bottom = "auto";
+
+    if (snapToEdge) {
+        localStorage.setItem("localHubAssistivePosition", JSON.stringify({
+            x: left / window.innerWidth,
+            y: top / window.innerHeight
+        }));
+    }
 }
 
 function updateViewerSidebarToggle() {
@@ -4571,7 +4637,7 @@ function updateViewerSidebarToggle() {
 
 (function setupViewerSidebarDrag() {
     const bar = document.getElementById("viewerBar");
-    const handle = document.getElementById("viewerTitle");
+    const handle = document.getElementById("viewerSidebarToggle");
     if (!bar || !handle) return;
 
     let pointerId = null;
@@ -4579,6 +4645,7 @@ function updateViewerSidebarToggle() {
     let startY = 0;
     let startLeft = 0;
     let startTop = 0;
+    let moved = false;
     let insets = { top: 0, right: 0, bottom: 0, left: 0 };
 
     function safeInset(side) {
@@ -4619,6 +4686,7 @@ function updateViewerSidebarToggle() {
         startY = event.clientY;
         startLeft = rect.left;
         startTop = rect.top;
+        moved = false;
         bar.classList.add("dragging");
         handle.setPointerCapture(pointerId);
         event.preventDefault();
@@ -4626,6 +4694,7 @@ function updateViewerSidebarToggle() {
 
     handle.addEventListener("pointermove", event => {
         if (event.pointerId !== pointerId) return;
+        if (Math.hypot(event.clientX - startX, event.clientY - startY) > 5) moved = true;
         moveTo(startLeft + event.clientX - startX, startTop + event.clientY - startY);
     });
 
@@ -4633,6 +4702,13 @@ function updateViewerSidebarToggle() {
         if (event.pointerId !== pointerId) return;
         pointerId = null;
         bar.classList.remove("dragging");
+        if (moved) {
+            bar.dataset.justDragged = "true";
+            keepViewerBarOnScreen(true);
+            setTimeout(() => {
+                bar.dataset.justDragged = "false";
+            }, 450);
+        }
     }
 
     handle.addEventListener("pointerup", stopDrag);
@@ -4641,6 +4717,7 @@ function updateViewerSidebarToggle() {
         refreshSafeInsets();
         const rect = bar.getBoundingClientRect();
         moveTo(rect.left, rect.top);
+        keepViewerBarOnScreen(false);
     });
 })();
 
@@ -6871,7 +6948,7 @@ loadMusic();
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
         navigator.serviceWorker
-            .register("./sw.js?v=16", { updateViaCache: "none" })
+            .register("./sw.js?v=17", { updateViaCache: "none" })
             .then(registration => registration.update())
             .catch(error => {
                 console.warn("Local Hub service worker was not registered:", error);
