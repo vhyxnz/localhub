@@ -170,7 +170,8 @@ window.addEventListener('message', event => {
 
 (async () => {
   try {
-    const [catalog, userApps] = await Promise.all([fetch('Local Hub Store/catalog.json').then(response => { if (!response.ok) throw new Error(); return response.json(); }), allApps()]);
+    const catalogUrl = 'Local Hub Store/catalog.json?refresh=' + Date.now();
+    const [catalog, userApps] = await Promise.all([fetch(catalogUrl, { cache: 'no-store' }).then(response => { if (!response.ok) throw new Error(); return response.json(); }), allApps()]);
     apps = [...catalog.map(app => ({ ...app, builtIn: true })), ...userApps];
     parent.postMessage({ type: 'localhub:list-installed', requestId: 'startup' }, '*');
     render();

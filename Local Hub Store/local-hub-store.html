@@ -28,4 +28,4 @@ function details(id){const a=apps.find(x=>x.id===id);document.querySelector('#de
 async function downloadApp(id){const a=apps.find(x=>x.id===id),url=URL.createObjectURL(a.file),link=document.createElement('a');link.href=url;link.download=a.file.name;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);a.downloads=(a.downloads||0)+1;const db=await openDB();db.transaction(STORE,'readwrite').objectStore(STORE).put(a);details(id);render()}
 async function deleteApp(id){if(!confirm('Remove this app and its saved file?'))return;await removeApp(id);apps=apps.filter(a=>a.id!==id);closeModal('detailModal');render();notify('App removed')}
 (async()=>{try{apps=await allApps();render()}catch(e){notify('This browser cannot save local files');render()}})();
-</script><script src="Local Hub Store/store.js"></script></body></html>
+</script><script src="Local Hub Store/store.js?v=21"></script></body></html>
