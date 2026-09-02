@@ -19,7 +19,18 @@
     "description": "Put your typing speed and accuracy to the test.",
     "icon": "Local Hub Store/icons/keyboard-warrior.png?v=1.4.2",
     "packageUrl": "Local Hub Store/localhub-apps/keyboard-warrior.localhub-app?v=1.4.2",
-    "size": 5500227
+    "size": 5500917
+  },
+  {
+    "id": "medimap",
+    "name": "MediMap",
+    "developer": "Local Hub Studio",
+    "version": "1.0.0",
+    "category": "Tools",
+    "description": "Find medicines quickly by name, category, gondola, or shelf and manage pharmacy inventory.",
+    "icon": "Local Hub Store/icons/medimap.png?v=1.0.0",
+    "packageUrl": "Local Hub Store/localhub-apps/medimap.localhub-app?v=1.0.0",
+    "size": 6825310
   },
   {
     "id": "specter",
@@ -47,11 +58,11 @@
     "id": "sweldo",
     "name": "Sweldo",
     "developer": "Local Hub Studio",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "category": "Finance",
     "description": "A Philippine salary calculator for take-home pay and deductions.",
-    "icon": "Local Hub Store/icons/sweldo.png?v=1.0.0",
-    "packageUrl": "Local Hub Store/localhub-apps/sweldo.localhub-app?v=1.0.0",
-    "size": 3470830
+    "icon": "Local Hub Store/icons/sweldo.png?v=1.1.0",
+    "packageUrl": "Local Hub Store/localhub-apps/sweldo.localhub-app?v=1.1.0",
+    "size": 3471899
   }
 ]

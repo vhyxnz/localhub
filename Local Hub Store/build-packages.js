@@ -8,9 +8,10 @@ const iconOutput = path.join(__dirname, "icons");
 const definitions = [
   { folder: "Flappy", id: "flappy", name: "Flappy", version: "1.0.0", category: "Games", description: "A polished, fast-paced flying arcade game.", icon: "Flappy_Bird_icon.png" },
   { folder: "Keyboard Warrior PWA", id: "keyboard-warrior", name: "Keyboard Warrior", version: "1.4.2", category: "Games", description: "Put your typing speed and accuracy to the test.", icon: "KWIcon2.png" },
+  { folder: "MediMap", id: "medimap", name: "MediMap", version: "1.0.0", category: "Tools", description: "Find medicines quickly by name, category, gondola, or shelf and manage pharmacy inventory.", icon: "MediFindLogo.png" },
   { folder: "Specter", id: "specter", name: "Specter", version: "1.0.0", category: "Lifestyle", description: "A private personal journal with a focused writing experience.", icon: "SpecterIcon.png" },
   { folder: "Squish", id: "squish", name: "Squish!", version: "1.1.2", category: "Games", description: "A cheerful random squish test with adorable characters.", icon: "SquishIcon.png" },
-  { folder: "Sweldo", id: "sweldo", name: "Sweldo", version: "1.0.0", category: "Finance", description: "A Philippine salary calculator for take-home pay and deductions.", icon: "SLogo.png" }
+  { folder: "Sweldo", id: "sweldo", name: "Sweldo", version: "1.1.0", category: "Finance", description: "A Philippine salary calculator for take-home pay and deductions.", icon: "SLogo.png" }
 ];
 
 const mime = ext => ({
@@ -33,9 +34,9 @@ function inlineAssets(folder) {
 
   for (const asset of assets) {
     const escaped = asset.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const pattern = new RegExp(`([\"'\\(])(?:\\.{1,2}\\/)*${escaped}([\"'\\)])`, "g");
+    const pattern = new RegExp(`([\"'\\(])(?:\\.{1,2}\\/)*${escaped}(#[^\"'\\)\\s]+)?([\"'\\)])`, "g");
     const value = dataUrl(path.join(directory, asset.name));
-    html = html.replace(pattern, (_, open, close) => `${open}${value}${close}`);
+    html = html.replace(pattern, (_, open, fragment = "", close) => `${open}${value}${fragment}${close}`);
   }
   return html;
 }
