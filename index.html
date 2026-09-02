@@ -2892,7 +2892,7 @@ body.music-panel-hidden.player-active .app { padding-bottom: 0; }
 
             <iframe
                 id="appFrame"
-                sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-pointer-lock">
+                sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-pointer-lock allow-downloads">
             </iframe>
 
         </div>
@@ -2917,7 +2917,7 @@ body.music-panel-hidden.player-active .app { padding-bottom: 0; }
 
             <iframe
                 id="appFrameSecondary"
-                sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-pointer-lock">
+                sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-pointer-lock allow-downloads">
             </iframe>
 
         </div>
@@ -7131,7 +7131,7 @@ loadMusic();
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
         navigator.serviceWorker
-            .register("./sw.js?v=22", { updateViaCache: "none" })
+            .register("./sw.js?v=23", { updateViaCache: "none" })
             .then(registration => registration.update())
             .catch(error => {
                 console.warn("Local Hub service worker was not registered:", error);
