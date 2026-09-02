@@ -25,12 +25,12 @@
     "id": "medimap",
     "name": "MediMap",
     "developer": "Local Hub Studio",
-    "version": "1.0.0",
+    "version": "1.1.1",
     "category": "Tools",
     "description": "Find medicines quickly by name, category, gondola, or shelf and manage pharmacy inventory.",
-    "icon": "Local Hub Store/icons/medimap.png?v=1.0.0",
-    "packageUrl": "Local Hub Store/localhub-apps/medimap.localhub-app?v=1.0.0",
-    "size": 6825310
+    "icon": "Local Hub Store/icons/medimap.png?v=1.1.1",
+    "packageUrl": "Local Hub Store/localhub-apps/medimap.localhub-app?v=1.1.1",
+    "size": 6828195
   },
   {
     "id": "specter",
