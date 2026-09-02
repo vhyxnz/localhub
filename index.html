@@ -3591,8 +3591,19 @@ async function installStorePackage(payload) {
     }
 
     await saveApps();
+    const persistedApps = await getStoredApps(appDB);
+    const persisted = persistedApps.find(app => app.id === installed.id);
+    if (!persisted || String(persisted.version || "") !== String(installed.version || "")) {
+        throw new Error("The updated app could not be verified in storage.");
+    }
     renderApps();
-    return { id: installed.id, name: installed.name, updated: Boolean(existing) };
+    return {
+        id: persisted.id,
+        name: persisted.name,
+        version: persisted.version || "0.0.0",
+        packageId: persisted.packageId || "",
+        updated: Boolean(existing)
+    };
 
 }
 
@@ -6948,7 +6959,7 @@ loadMusic();
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
         navigator.serviceWorker
-            .register("./sw.js?v=17", { updateViaCache: "none" })
+            .register("./sw.js?v=18", { updateViaCache: "none" })
             .then(registration => registration.update())
             .catch(error => {
                 console.warn("Local Hub service worker was not registered:", error);
