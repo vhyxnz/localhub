@@ -754,6 +754,9 @@ button {
 }
 
 .viewer-bar {
+    --assistive-opacity: .9;
+    --assistive-accent: #9770ff;
+    --assistive-accent2: #5d41e0;
     position: absolute;
     z-index: 10;
 
@@ -775,7 +778,7 @@ button {
     align-items: center;
     gap: 10px;
 
-    background: rgba(18,18,25,.9);
+    background: rgb(18 18 25 / var(--assistive-opacity));
     border: 1px solid rgba(255,255,255,.16);
 
     backdrop-filter: blur(22px) saturate(150%);
@@ -813,7 +816,7 @@ button {
     height: 48px;
     flex: 0 0 auto;
     border-radius: 50%;
-    background: linear-gradient(145deg, rgba(151,112,255,.98), rgba(93,65,224,.98));
+    background: linear-gradient(145deg, var(--assistive-accent), var(--assistive-accent2));
     color: var(--text);
     font-size: 20px;
     border: 1px solid rgba(255,255,255,.08);
@@ -859,9 +862,60 @@ button {
 .viewer-actions {
     width: 100%;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(3, 1fr);
     gap: 8px;
 }
+
+.viewer-bar.density-compact:not(.collapsed) {
+    width: 184px;
+    padding: 9px;
+    gap: 7px;
+    border-radius: 21px;
+}
+
+.viewer-bar.density-compact:not(.collapsed) .view-btn { height: 42px; font-size: 15px; }
+.viewer-bar.density-compact:not(.collapsed) .viewer-close { height: 36px; }
+
+.assistive-customizer {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: calc(18px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom));
+    background: rgba(0,0,0,.48);
+    backdrop-filter: blur(9px);
+}
+
+.assistive-customizer.active { display: flex; }
+
+.assistive-customizer-card {
+    width: min(360px, 100%);
+    max-height: 100%;
+    overflow: auto;
+    padding: 20px;
+    border-radius: 24px;
+    background: #151722;
+    border: 1px solid rgba(255,255,255,.12);
+    box-shadow: 0 28px 80px rgba(0,0,0,.55);
+}
+
+.assistive-customizer-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.assistive-customizer-head h3 { margin: 0; font-size: 17px; }
+.assistive-customizer-head button { width: 34px; height: 34px; border-radius: 10px; background: rgba(255,255,255,.07); }
+.assistive-setting { margin-top: 18px; }
+.assistive-setting-label { display: flex; justify-content: space-between; margin-bottom: 9px; color: #c8cbda; font-size: 12px; font-weight: 700; }
+.assistive-colors { display: grid; grid-template-columns: repeat(5, 1fr); gap: 9px; }
+.assistive-color { aspect-ratio: 1; border-radius: 50%; background: var(--swatch); border: 3px solid transparent; box-shadow: inset 0 0 0 1px rgba(255,255,255,.18); }
+.assistive-color.active { border-color: white; box-shadow: 0 0 0 3px rgba(255,255,255,.14); }
+.assistive-segments { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; padding: 4px; border-radius: 14px; background: rgba(255,255,255,.045); }
+.assistive-segments button { height: 38px; border-radius: 10px; background: transparent; color: var(--muted); font-size: 11px; font-weight: 750; }
+.assistive-segments button.active { background: rgba(255,255,255,.12); color: white; }
+.assistive-range { width: 100%; accent-color: var(--assistive-accent, #9770ff); }
+.assistive-check { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 12px 0; border-top: 1px solid rgba(255,255,255,.07); color: #d9dcec; font-size: 12px; }
+.assistive-check input { width: 19px; height: 19px; accent-color: #8b5cf6; }
+.assistive-reset { width: 100%; height: 40px; margin-top: 12px; border-radius: 12px; background: rgba(255,255,255,.065); color: #d9dcec; font-size: 11px; font-weight: 750; }
 
 .viewer-close {
     width: 100%;
@@ -2778,6 +2832,8 @@ body.music-panel-hidden.player-active .app { padding-bottom: 0; }
                 title="Split view with another app" aria-label="Split view">⊞</button>
             <button id="musicOverlayBtn" class="view-btn active" data-label="Music" onclick="toggleMusicOverlay()"
                 title="Toggle music player overlay" aria-label="Toggle music player">♫</button>
+            <button class="view-btn" data-label="Style" onclick="openAssistiveCustomizer()"
+                title="Customize assistive controls" aria-label="Customize assistive controls">⚙</button>
         </div>
 
         <button
@@ -2788,6 +2844,35 @@ body.music-panel-hidden.player-active .app { padding-bottom: 0; }
             ×
         </button>
 
+    </div>
+
+    <div id="assistiveCustomizer" class="assistive-customizer" onclick="closeAssistiveCustomizer(event)">
+        <div class="assistive-customizer-card" onclick="event.stopPropagation()">
+            <div class="assistive-customizer-head">
+                <h3>Assistive controls</h3>
+                <button onclick="closeAssistiveCustomizer()" aria-label="Close customization">×</button>
+            </div>
+            <div class="assistive-setting">
+                <div class="assistive-setting-label"><span>Accent color</span></div>
+                <div id="assistiveColors" class="assistive-colors"></div>
+            </div>
+            <div class="assistive-setting">
+                <div class="assistive-setting-label"><span>Expanded size</span></div>
+                <div class="assistive-segments">
+                    <button data-density="compact" onclick="setAssistiveDensity('compact')">Compact</button>
+                    <button data-density="comfortable" onclick="setAssistiveDensity('comfortable')">Comfortable</button>
+                </div>
+            </div>
+            <div class="assistive-setting">
+                <div class="assistive-setting-label"><span>Panel opacity</span><span id="assistiveOpacityValue">90%</span></div>
+                <input id="assistiveOpacity" class="assistive-range" type="range" min="55" max="100" step="5" oninput="setAssistiveOpacity(this.value)">
+            </div>
+            <div class="assistive-setting">
+                <label class="assistive-check"><span>Start collapsed</span><input id="assistiveStartCollapsed" type="checkbox" onchange="setAssistiveOption('startCollapsed', this.checked)"></label>
+                <label class="assistive-check"><span>Remember screen position</span><input id="assistiveRememberPosition" type="checkbox" onchange="setAssistiveOption('rememberPosition', this.checked)"></label>
+            </div>
+            <button class="assistive-reset" onclick="resetAssistiveCustomization()">Reset customization</button>
+        </div>
     </div>
 
     <div
@@ -4558,6 +4643,79 @@ document.addEventListener("click", event => {
    VIEWER CONTROLS SIDEBAR
 ========================================== */
 
+const ASSISTIVE_SETTINGS_KEY = "localHubAssistiveSettings";
+const ASSISTIVE_COLORS = {
+    violet: ["#9770ff", "#5d41e0"],
+    blue: ["#55a7ff", "#2563eb"],
+    teal: ["#40d9c2", "#0f8f83"],
+    coral: ["#ff8a78", "#e34f65"],
+    graphite: ["#aeb5c7", "#596174"]
+};
+let assistiveSettings = { color: "violet", density: "comfortable", opacity: 90, startCollapsed: true, rememberPosition: true };
+
+function saveAssistiveSettings() {
+    localStorage.setItem(ASSISTIVE_SETTINGS_KEY, JSON.stringify(assistiveSettings));
+}
+
+function loadAssistiveSettings() {
+    try {
+        assistiveSettings = { ...assistiveSettings, ...JSON.parse(localStorage.getItem(ASSISTIVE_SETTINGS_KEY) || "{}") };
+    } catch {}
+    applyAssistiveSettings();
+}
+
+function applyAssistiveSettings() {
+    const bar = document.getElementById("viewerBar");
+    if (!bar) return;
+    const colors = ASSISTIVE_COLORS[assistiveSettings.color] || ASSISTIVE_COLORS.violet;
+    bar.style.setProperty("--assistive-accent", colors[0]);
+    bar.style.setProperty("--assistive-accent2", colors[1]);
+    bar.style.setProperty("--assistive-opacity", assistiveSettings.opacity / 100);
+    bar.classList.toggle("density-compact", assistiveSettings.density === "compact");
+    syncAssistiveCustomizer();
+}
+
+function syncAssistiveCustomizer() {
+    const colors = document.getElementById("assistiveColors");
+    if (!colors) return;
+    colors.innerHTML = Object.entries(ASSISTIVE_COLORS).map(([name, pair]) =>
+        `<button class="assistive-color${assistiveSettings.color === name ? " active" : ""}" style="--swatch:linear-gradient(145deg,${pair[0]},${pair[1]})" onclick="setAssistiveColor('${name}')" aria-label="${name} accent"></button>`
+    ).join("");
+    document.querySelectorAll("[data-density]").forEach(button => button.classList.toggle("active", button.dataset.density === assistiveSettings.density));
+    const opacity = document.getElementById("assistiveOpacity");
+    if (opacity) opacity.value = assistiveSettings.opacity;
+    document.getElementById("assistiveOpacityValue").textContent = `${assistiveSettings.opacity}%`;
+    document.getElementById("assistiveStartCollapsed").checked = assistiveSettings.startCollapsed;
+    document.getElementById("assistiveRememberPosition").checked = assistiveSettings.rememberPosition;
+}
+
+function openAssistiveCustomizer() {
+    syncAssistiveCustomizer();
+    document.getElementById("assistiveCustomizer").classList.add("active");
+}
+
+function closeAssistiveCustomizer(event) {
+    if (event && event.target !== event.currentTarget) return;
+    document.getElementById("assistiveCustomizer").classList.remove("active");
+}
+
+function setAssistiveColor(color) { assistiveSettings.color = color; saveAssistiveSettings(); applyAssistiveSettings(); }
+function setAssistiveDensity(density) { assistiveSettings.density = density; saveAssistiveSettings(); applyAssistiveSettings(); requestAnimationFrame(() => keepViewerBarOnScreen(false)); }
+function setAssistiveOpacity(value) { assistiveSettings.opacity = Number(value); saveAssistiveSettings(); applyAssistiveSettings(); }
+function setAssistiveOption(option, value) {
+    assistiveSettings[option] = value;
+    if (option === "rememberPosition" && !value) localStorage.removeItem("localHubAssistivePosition");
+    saveAssistiveSettings();
+}
+
+function resetAssistiveCustomization() {
+    assistiveSettings = { color: "violet", density: "comfortable", opacity: 90, startCollapsed: true, rememberPosition: true };
+    localStorage.removeItem("localHubAssistivePosition");
+    saveAssistiveSettings();
+    applyAssistiveSettings();
+    resetViewerBarPosition();
+}
+
 function resetViewerBarPosition() {
 
     const bar =
@@ -4565,11 +4723,11 @@ function resetViewerBarPosition() {
 
     if (!bar) return;
 
-    bar.classList.add("collapsed");
+    bar.classList.toggle("collapsed", assistiveSettings.startCollapsed);
     updateViewerSidebarToggle();
 
     try {
-        const saved = JSON.parse(localStorage.getItem("localHubAssistivePosition"));
+        const saved = assistiveSettings.rememberPosition && JSON.parse(localStorage.getItem("localHubAssistivePosition"));
         if (saved && Number.isFinite(saved.x) && Number.isFinite(saved.y)) {
             bar.style.left = `${saved.x * window.innerWidth}px`;
             bar.style.top = `${saved.y * window.innerHeight}px`;
@@ -4607,17 +4765,30 @@ function toggleViewerSidebar(event) {
 
 }
 
+function readSafeInset(side) {
+    const probe = document.createElement("div");
+    probe.style.cssText = `position:fixed;visibility:hidden;pointer-events:none;${side}:env(safe-area-inset-${side})`;
+    document.body.appendChild(probe);
+    const value = parseFloat(getComputedStyle(probe)[side]) || 0;
+    probe.remove();
+    return value;
+}
+
 function keepViewerBarOnScreen(snapToEdge = false) {
     const bar = document.getElementById("viewerBar");
     if (!bar) return;
     const rect = bar.getBoundingClientRect();
     const gap = 10;
-    let left = Math.min(Math.max(rect.left, gap), Math.max(gap, window.innerWidth - rect.width - gap));
-    const top = Math.min(Math.max(rect.top, gap), Math.max(gap, window.innerHeight - rect.height - gap));
+    const minLeft = readSafeInset("left") + gap;
+    const minTop = readSafeInset("top") + gap;
+    const maxLeft = window.innerWidth - rect.width - readSafeInset("right") - gap;
+    const maxTop = window.innerHeight - rect.height - readSafeInset("bottom") - gap;
+    let left = Math.min(Math.max(rect.left, minLeft), Math.max(minLeft, maxLeft));
+    const top = Math.min(Math.max(rect.top, minTop), Math.max(minTop, maxTop));
 
-    if (snapToEdge) {
+    if (snapToEdge && assistiveSettings.rememberPosition) {
         const center = left + rect.width / 2;
-        left = center < window.innerWidth / 2 ? gap : window.innerWidth - rect.width - gap;
+        left = center < window.innerWidth / 2 ? minLeft : maxLeft;
     }
 
     bar.style.left = `${left}px`;
@@ -6950,6 +7121,7 @@ async function importLocalHubData(event) {
    START
 ========================================== */
 
+loadAssistiveSettings();
 loadMusicPanelPreference();
 stabiliseMusicIcons();
 loadApps();
@@ -6959,7 +7131,7 @@ loadMusic();
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
         navigator.serviceWorker
-            .register("./sw.js?v=18", { updateViaCache: "none" })
+            .register("./sw.js?v=20", { updateViaCache: "none" })
             .then(registration => registration.update())
             .catch(error => {
                 console.warn("Local Hub service worker was not registered:", error);
