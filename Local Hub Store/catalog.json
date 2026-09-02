@@ -25,12 +25,12 @@
     "id": "medimap",
     "name": "MediMap",
     "developer": "Local Hub Studio",
-    "version": "1.1.1",
+    "version": "1.4.0",
     "category": "Tools",
     "description": "Find medicines quickly by name, category, gondola, or shelf and manage pharmacy inventory.",
-    "icon": "Local Hub Store/icons/medimap.png?v=1.1.1",
-    "packageUrl": "Local Hub Store/localhub-apps/medimap.localhub-app?v=1.1.1",
-    "size": 6828195
+    "icon": "Local Hub Store/icons/medimap.png?v=1.4.0",
+    "packageUrl": "Local Hub Store/localhub-apps/medimap.localhub-app?v=1.4.0",
+    "size": 6874024
   },
   {
     "id": "specter",
@@ -58,11 +58,11 @@
     "id": "sweldo",
     "name": "Sweldo",
     "developer": "Local Hub Studio",
-    "version": "1.2.0",
+    "version": "1.3.0",
     "category": "Finance",
     "description": "A Philippine salary calculator for take-home pay and deductions.",
-    "icon": "Local Hub Store/icons/sweldo.png?v=1.2.0",
-    "packageUrl": "Local Hub Store/localhub-apps/sweldo.localhub-app?v=1.2.0",
-    "size": 3486497
+    "icon": "Local Hub Store/icons/sweldo.png?v=1.3.0",
+    "packageUrl": "Local Hub Store/localhub-apps/sweldo.localhub-app?v=1.3.0",
+    "size": 3492272
   }
 ]
