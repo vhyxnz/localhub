@@ -118,13 +118,25 @@ async function installOrDownload(id) {
   if (isInstallable(app)) {
     try {
       notify('Installing ' + app.name + '…');
-      const response = app.packageUrl ? await fetch(app.packageUrl) : null;
+      const packageUrl = app.packageUrl
+        ? app.packageUrl + (app.packageUrl.includes('?') ? '&' : '?') + 'refresh=' + Date.now()
+        : '';
+      const response = packageUrl ? await fetch(packageUrl, { cache: 'no-store' }) : null;
       if (response && !response.ok) throw new Error('Package unavailable');
       const payload = JSON.parse(response ? await response.text() : await app.file.text());
+      if (
+        app.builtIn
+        && (
+          String(payload.app?.packageId || '') !== String(app.id)
+          || String(payload.app?.version || '') !== String(app.version || '')
+        )
+      ) {
+        throw new Error(`The ${app.version} package is not deployed yet`);
+      }
       const requestId = Date.now() + '-' + Math.random().toString(36).slice(2);
       pending.set(requestId, app);
       parent.postMessage({ type: 'localhub:install-package', requestId, payload }, '*');
-    } catch { notify('Could not install ' + app.name); }
+    } catch (error) { notify(error.message || ('Could not install ' + app.name)); }
   } else {
     const url = URL.createObjectURL(app.file), link = document.createElement('a'); link.href = url; link.download = app.file.name; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
@@ -146,7 +158,13 @@ window.addEventListener('message', event => {
   }
   if (event.data?.type !== 'localhub:install-result') return;
   const app = pending.get(event.data.requestId); pending.delete(event.data.requestId);
-  if (event.data.ok && app) { installed.set(String(app.id), app.version || '0.0.0'); installed.set('name:' + normaliseAppName(app.name), app.version || '0.0.0'); details(key(app.id)); render(); notify(app.name + (event.data.updated ? ' was updated' : ' is installed')); }
+  if (event.data.ok && app) {
+    const savedVersion = event.data.version || '0.0.0';
+    installed.set(String(app.id), savedVersion);
+    installed.set('name:' + normaliseAppName(app.name), savedVersion);
+    details(key(app.id)); render();
+    notify(`${app.name} ${savedVersion} ${event.data.updated ? 'was updated' : 'is installed'}`);
+  }
   else notify(event.data.error || 'Install failed');
 });
 
