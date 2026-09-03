@@ -44,6 +44,7 @@ const esc = value => String(value || '').replace(/[&<>'"]/g, character => ({ '&'
 const size = bytes => bytes > 1e6 ? (bytes / 1e6).toFixed(1) + ' MB' : Math.max(1, Math.round((bytes || 0) / 1000)) + ' KB';
 const key = id => encodeURIComponent(String(id));
 const getApp = id => apps.find(app => String(app.id) === decodeURIComponent(id));
+const uiIcon = name => `<svg class="ui-icon" aria-hidden="true"><use href="Local Hub Store/store-icons.svg#${name}"></use></svg>`;
 
 function icon(app, big = '') {
   return `<div class="icon ${big}" ${app.icon ? `style="background-image:url(&quot;${esc(app.icon)}&quot;)"` : ''}><b>${app.icon ? '' : esc(app.name[0])}</b></div>`;
@@ -76,16 +77,18 @@ function hasUpdate(app) {
 }
 
 function actionLabel(app) {
-  if (hasUpdate(app)) return `↻ Update to ${esc(app.version)}`;
-  if (installedVersion(app) !== undefined) return '✓ Installed';
-  return isInstallable(app) ? '＋ Install in Local Hub' : `↓ Download ${esc(app.fileType || 'file')}`;
+  if (hasUpdate(app)) return `<span class="button-content">${uiIcon('refresh')}Update to ${esc(app.version)}</span>`;
+  if (installedVersion(app) !== undefined) return `<span class="button-content">${uiIcon('check')}Installed</span>`;
+  return isInstallable(app)
+    ? `<span class="button-content">${uiIcon('download')}Install in Local Hub</span>`
+    : `<span class="button-content">${uiIcon('download')}Download ${esc(app.fileType || 'file')}</span>`;
 }
 
 function render() {
   const query = document.querySelector('#search').value.toLowerCase();
   document.querySelector('#chips').innerHTML = cats.map(category => `<button class="${category === active ? 'active' : ''}" onclick="active='${category}';render()">${category}</button>`).join('');
   const list = apps.filter(app => (active === 'All' || app.category === active) && `${app.name} ${app.developer} ${app.description}`.toLowerCase().includes(query));
-  document.querySelector('#grid').innerHTML = list.length ? list.map(app => `<article class="card" onclick="details('${key(app.id)}')">${icon(app)}<div class="info"><h3>${esc(app.name)}</h3><p>${esc(app.category)} · ${esc(app.developer)}</p><div class="meta"><span>${app.builtIn ? 'LOCAL HUB APP' : 'COMMUNITY'}</span><span>${size(app.size || app.file?.size)}</span><span class="tag">${hasUpdate(app) ? 'UPDATE' : installedVersion(app) !== undefined ? 'INSTALLED' : 'APP'}</span></div></div><div class="arrow">›</div></article>`).join('') : '<div class="empty"><h3>No apps found</h3><p>Try another search or category.</p></div>';
+  document.querySelector('#grid').innerHTML = list.length ? list.map(app => `<article class="card" onclick="details('${key(app.id)}')">${icon(app)}<div class="info"><h3>${esc(app.name)}</h3><p>${esc(app.category)} · ${esc(app.developer)}</p><div class="meta"><span>${app.builtIn ? 'LOCAL HUB APP' : 'COMMUNITY'}</span><span>${size(app.size || app.file?.size)}</span><span class="tag">${hasUpdate(app) ? 'UPDATE' : installedVersion(app) !== undefined ? 'INSTALLED' : 'APP'}</span></div></div><div class="arrow">${uiIcon('chevron')}</div></article>`).join('') : '<div class="empty"><h3>No apps found</h3><p>Try another search or category.</p></div>';
 }
 
 function openUpload() { document.querySelector('#uploadModal').classList.add('open'); }
@@ -108,8 +111,8 @@ document.querySelector('#form').onsubmit = async event => {
 
 function details(id) {
   const app = getApp(id); if (!app) return;
-  const removable = app.builtIn ? '' : `<button class="danger" onclick="deleteApp('${key(app.id)}')">Remove from store</button>`;
-  document.querySelector('#detail').innerHTML = `<button class="close" onclick="closeModal('detailModal')">✕</button><div class="detail-head">${icon(app, 'big')}<div><span class="tag">${app.builtIn ? 'LOCALHUB-APP' : esc(app.fileType || 'APP')}</span><h2>${esc(app.name)}</h2><p class="sub">${esc(app.developer)}</p></div></div><p class="desc">${esc(app.description)}</p><div class="stats"><div><b>${esc(app.version)}</b><span>version</span></div><div><b>${size(app.size || app.file?.size)}</b><span>package size</span></div><div><b>Offline</b><span>after install</span></div></div><button class="primary download" ${installedVersion(app) !== undefined && !hasUpdate(app) ? 'disabled' : ''} onclick="installOrDownload('${key(app.id)}')">${actionLabel(app)}</button>${removable}`;
+  const removable = app.builtIn ? '' : `<button class="danger" onclick="deleteApp('${key(app.id)}')">${uiIcon('trash')}Remove from store</button>`;
+  document.querySelector('#detail').innerHTML = `<button class="close" onclick="closeModal('detailModal')" aria-label="Close">${uiIcon('close')}</button><div class="detail-head">${icon(app, 'big')}<div><span class="tag">${app.builtIn ? 'LOCALHUB-APP' : esc(app.fileType || 'APP')}</span><h2>${esc(app.name)}</h2><p class="sub">${esc(app.developer)}</p></div></div><p class="desc">${esc(app.description)}</p><div class="stats"><div><b>${esc(app.version)}</b><span>version</span></div><div><b>${size(app.size || app.file?.size)}</b><span>package size</span></div><div><b>Offline</b><span>after install</span></div></div><button class="primary download" ${installedVersion(app) !== undefined && !hasUpdate(app) ? 'disabled' : ''} onclick="installOrDownload('${key(app.id)}')">${actionLabel(app)}</button>${removable}`;
   document.querySelector('#detailModal').classList.add('open');
 }
 
@@ -170,6 +173,10 @@ window.addEventListener('message', event => {
 
 (async () => {
   try {
+    const uploadClose = document.querySelector('#uploadModal .close');
+    const publishButton = document.querySelector('#form button[type="submit"]');
+    if (uploadClose) { uploadClose.innerHTML = uiIcon('close'); uploadClose.setAttribute('aria-label', 'Close'); }
+    if (publishButton) publishButton.innerHTML = `${uiIcon('upload')}Publish to store`;
     const catalogUrl = 'Local Hub Store/catalog.json?refresh=' + Date.now();
     const [catalog, userApps] = await Promise.all([fetch(catalogUrl, { cache: 'no-store' }).then(response => { if (!response.ok) throw new Error(); return response.json(); }), allApps()]);
     apps = [...catalog.map(app => ({ ...app, builtIn: true })), ...userApps];

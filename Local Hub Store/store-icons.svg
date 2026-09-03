@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <symbol id="home" viewBox="0 0 24 24"><path d="M3 10.8 12 3l9 7.8v9.1a1.1 1.1 0 0 1-1.1 1.1h-5.3v-6.4H9.4V21H4.1A1.1 1.1 0 0 1 3 19.9Z"/></symbol>
+  <symbol id="apps" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></symbol>
+  <symbol id="upload" viewBox="0 0 24 24"><path d="M12 16V3m0 0L7 8m5-5 5 5"/><path d="M5 13v7h14v-7"/></symbol>
+  <symbol id="search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></symbol>
+  <symbol id="shield" viewBox="0 0 24 24"><path d="M12 2.5 20 6v5.6c0 5.1-3.2 8.6-8 10-4.8-1.4-8-4.9-8-10V6Z"/><path d="m8.5 12 2.2 2.2 4.8-5"/></symbol>
+  <symbol id="sparkle" viewBox="0 0 24 24"><path d="M12 2.5c.8 5.3 3.2 7.7 8.5 8.5-5.3.8-7.7 3.2-8.5 8.5-.8-5.3-3.2-7.7-8.5-8.5 5.3-.8 7.7-3.2 8.5-8.5Z"/></symbol>
+  <symbol id="chevron" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+  <symbol id="close" viewBox="0 0 24 24"><path d="m5 5 14 14M19 5 5 19"/></symbol>
+  <symbol id="download" viewBox="0 0 24 24"><path d="M12 3v12m0 0 5-5m-5 5-5-5"/><path d="M4 20h16"/></symbol>
+  <symbol id="refresh" viewBox="0 0 24 24"><path d="M20 7v5h-5"/><path d="M19 12a7 7 0 1 0-2 5"/></symbol>
+  <symbol id="check" viewBox="0 0 24 24"><path d="m4 12.5 5 5L20 6.5"/></symbol>
+  <symbol id="trash" viewBox="0 0 24 24"><path d="M4 7h16M9 3h6l1 4H8Z"/><path d="m7 7 1 14h8l1-14M10 11v6m4-6v6"/></symbol>
+</svg>
