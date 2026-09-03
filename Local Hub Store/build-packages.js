@@ -11,7 +11,7 @@ const definitions = [
   { folder: "MediMap", id: "medimap", name: "MediMap", version: "1.4.0", category: "Tools", description: "Find medicines quickly by name, category, gondola, or shelf and manage pharmacy inventory.", icon: "MediFindLogo.png" },
   { folder: "Specter", id: "specter", name: "Specter", version: "1.0.0", category: "Lifestyle", description: "A private personal journal with a focused writing experience.", icon: "SpecterIcon.png" },
   { folder: "Squish", id: "squish", name: "Squish!", version: "1.1.2", category: "Games", description: "A cheerful random squish test with adorable characters.", icon: "SquishIcon.png" },
-  { folder: "Sweldo", id: "sweldo", name: "Sweldo", version: "1.3.1", category: "Finance", description: "A Philippine salary calculator for take-home pay and deductions.", icon: "SLogo.png" }
+  { folder: "Sweldo", id: "sweldo", name: "Sweldo", version: "1.4.0", category: "Finance", description: "A Philippine salary calculator for take-home pay and deductions.", icon: "SLogo.png" }
 ];
 
 const mime = ext => ({

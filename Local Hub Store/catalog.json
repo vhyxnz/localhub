@@ -58,11 +58,11 @@
     "id": "sweldo",
     "name": "Sweldo",
     "developer": "Local Hub Studio",
-    "version": "1.3.0",
+    "version": "1.4.0",
     "category": "Finance",
     "description": "A Philippine salary calculator for take-home pay and deductions.",
-    "icon": "Local Hub Store/icons/sweldo.png?v=1.3.0",
-    "packageUrl": "Local Hub Store/localhub-apps/sweldo.localhub-app?v=1.3.0",
-    "size": 3492272
+    "icon": "Local Hub Store/icons/sweldo.png?v=1.4.0",
+    "packageUrl": "Local Hub Store/localhub-apps/sweldo.localhub-app?v=1.4.0",
+    "size": 3493606
   }
 ]
