@@ -778,7 +778,7 @@ button {
     align-items: center;
     gap: 10px;
 
-    background: rgb(18 18 25 / var(--assistive-opacity));
+    background: rgba(18,18,25,.9);
     border: 1px solid rgba(255,255,255,.16);
 
     backdrop-filter: blur(22px) saturate(150%);
@@ -797,6 +797,7 @@ button {
         padding .22s ease,
         border-radius .22s ease,
         background .2s ease,
+        opacity .2s ease,
         box-shadow .2s ease,
         border-color .2s ease;
 }
@@ -807,7 +808,11 @@ button {
     padding: 6px;
     border-radius: 50%;
     background: rgba(20,20,27,.78);
+    opacity: var(--assistive-opacity);
 }
+
+.viewer-bar:not(.collapsed),
+.viewer-bar.dragging { opacity: 1; }
 
 .viewer-bar.collapsed > :not(.viewer-sidebar-toggle) { display: none; }
 
@@ -970,6 +975,23 @@ button {
     transition:
         background .2s ease,
         color .2s ease;
+}
+
+.assistive-control-icon {
+    width: 20px;
+    height: 20px;
+    display: block;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.viewer-close .assistive-control-icon {
+    width: 18px;
+    height: 18px;
+    margin: auto;
 }
 
 .view-btn[data-label]::after {
@@ -2804,7 +2826,7 @@ body.music-panel-hidden.player-active .app { padding-bottom: 0; }
                 data-label="Desktop"
                 onclick="setViewMode('desktop')"
                 title="Desktop view">
-                🖥️
+                <svg class="assistive-control-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
             </button>
 
             <button
@@ -2813,7 +2835,7 @@ body.music-panel-hidden.player-active .app { padding-bottom: 0; }
                 data-label="Phone"
                 onclick="setViewMode('mobile')"
                 title="Mobile view">
-                📱
+                <svg class="assistive-control-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="2" width="11" height="20" rx="2.5"/><path d="M10 5h4M11 19h2"/></svg>
             </button>
 
             <button
@@ -2822,18 +2844,18 @@ body.music-panel-hidden.player-active .app { padding-bottom: 0; }
                 data-label="Resize"
                 onclick="setViewMode('adjustable')"
                 title="Adjustable view (drag corner to resize)">
-                ⤢
+                <svg class="assistive-control-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5M3 8l6-5M21 8l-6-5M3 16l6 5M21 16l-6 5"/></svg>
             </button>
 
         </div>
 
         <div class="viewer-actions">
             <button id="splitViewBtn" class="view-btn" data-label="Split" onclick="openSplitPicker(event)"
-                title="Split view with another app" aria-label="Split view">⊞</button>
+                title="Split view with another app" aria-label="Split view"><svg class="assistive-control-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M12 4v16"/></svg></button>
             <button id="musicOverlayBtn" class="view-btn active" data-label="Music" onclick="toggleMusicOverlay()"
-                title="Toggle music player overlay" aria-label="Toggle music player">♫</button>
+                title="Toggle music player overlay" aria-label="Toggle music player"><svg class="assistive-control-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l10-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="16" cy="16" r="3"/></svg></button>
             <button class="view-btn" data-label="Style" onclick="openAssistiveCustomizer()"
-                title="Customize assistive controls" aria-label="Customize assistive controls">⚙</button>
+                title="Customize assistive controls" aria-label="Customize assistive controls"><svg class="assistive-control-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h7M15 6h5M4 12h3M11 12h9M4 18h9M17 18h3"/><circle cx="13" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="15" cy="18" r="2"/></svg></button>
         </div>
 
         <button
@@ -2841,7 +2863,7 @@ body.music-panel-hidden.player-active .app { padding-bottom: 0; }
             onclick="closeViewer()"
             title="Close app"
             aria-label="Close app">
-            ×
+            <svg class="assistive-control-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
         </button>
 
     </div>
@@ -2864,8 +2886,8 @@ body.music-panel-hidden.player-active .app { padding-bottom: 0; }
                 </div>
             </div>
             <div class="assistive-setting">
-                <div class="assistive-setting-label"><span>Panel opacity</span><span id="assistiveOpacityValue">90%</span></div>
-                <input id="assistiveOpacity" class="assistive-range" type="range" min="55" max="100" step="5" oninput="setAssistiveOpacity(this.value)">
+                <div class="assistive-setting-label"><span>Collapsed button transparency</span><span id="assistiveOpacityValue">90%</span></div>
+                <input id="assistiveOpacity" class="assistive-range" type="range" min="25" max="100" step="5" oninput="setAssistiveOpacity(this.value)" aria-label="Collapsed button transparency">
             </div>
             <div class="assistive-setting">
                 <label class="assistive-check"><span>Start collapsed</span><input id="assistiveStartCollapsed" type="checkbox" onchange="setAssistiveOption('startCollapsed', this.checked)"></label>
@@ -7131,7 +7153,7 @@ loadMusic();
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
         navigator.serviceWorker
-            .register("./sw.js?v=24", { updateViaCache: "none" })
+            .register("./sw.js?v=25", { updateViaCache: "none" })
             .then(registration => registration.update())
             .catch(error => {
                 console.warn("Local Hub service worker was not registered:", error);
