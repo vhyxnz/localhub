@@ -14,12 +14,12 @@
     "id": "keyboard-warrior",
     "name": "Keyboard Warrior",
     "developer": "Local Hub Studio",
-    "version": "1.5.0",
+    "version": "2.1.1",
     "category": "Games",
     "description": "Put your typing speed and accuracy to the test.",
-    "icon": "Local Hub Store/icons/keyboard-warrior.png?v=1.5.0",
-    "packageUrl": "Local Hub Store/localhub-apps/keyboard-warrior.localhub-app?v=1.5.0",
-    "size": 5507423
+    "icon": "Local Hub Store/icons/keyboard-warrior.png?v=2.1.1",
+    "packageUrl": "Local Hub Store/localhub-apps/keyboard-warrior.localhub-app?v=2.1.1",
+    "size": 7636769
   },
   {
     "id": "medimap",
