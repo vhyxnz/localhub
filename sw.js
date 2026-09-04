@@ -1,4 +1,4 @@
-const CACHE_NAME = "local-hub-pwa-v25";
+const CACHE_NAME = "local-hub-pwa-v26";
 const APP_SHELL = [
     "./",
     "./index.html",

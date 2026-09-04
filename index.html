@@ -2279,10 +2279,39 @@ body.music-panel-hidden.player-active .app { padding-bottom: 0; }
     .player-controls { gap: 4px; }
     .player-btn { flex: 0 0 32px; min-width: 32px; padding: 0; }
 }
+.hub-icon { width:20px; height:20px; display:inline-block; vertical-align:middle; flex-shrink:0; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
+.library-view-controls { display:flex; gap:8px; margin:16px 0; }
+.library-view-controls button { padding:10px 14px; border-radius:12px; background:rgba(255,255,255,.07); color:var(--muted); }
+.library-view-controls button[aria-pressed="true"] { background:var(--accent); color:white; }
+.app-grid.icon-library { grid-template-columns:repeat(auto-fill,minmax(90px,1fr)); gap:24px 12px; }
+.icon-library .app-card { min-height:0; background:none; border:0; border-radius:16px; overflow:visible; cursor:pointer; touch-action:pan-y; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; }
+.icon-library .app-card:hover { transform:translateY(-3px); box-shadow:none; }
+.icon-library .card-top { height:80px; padding:0; background:none; }
+.icon-library .app-icon,.icon-library .default-icon { width:72px; height:72px; border-radius:20px; object-fit:cover; }
+.icon-library .card-body { padding:8px 2px 0; text-align:center; }
+.icon-library .app-name { font-size:12px; line-height:1.4; white-space:normal; overflow-wrap:anywhere; }
+.icon-library .app-info,.icon-library .card-actions { display:none; }
+.icon-library .favorite { top:-5px; right:4px; width:24px; height:24px; z-index:2; }
+.icon-library .favorite:not(.active) { display:none; }
+.icon-library .favorite .hub-icon { width:14px; height:14px; }
+.favorite.active .hub-icon { fill:currentColor; }
+.app-card:focus-visible { outline:2px solid var(--accent); outline-offset:4px; }
+.opening-sequence { position:fixed; inset:0; z-index:10000; display:grid; place-content:center; justify-items:center; gap:18px; background:#0b0b16; color:white; transition:opacity .35s ease; }
+.opening-sequence img { width:96px; height:96px; object-fit:contain; animation:hub-arrive .7s ease both; }
+.opening-sequence h2 { margin:0; letter-spacing:.16em; }
+.opening-sequence button { padding:12px 20px; border-radius:14px; background:#7952ef; color:white; }
+.opening-sequence.leaving { opacity:0; pointer-events:none; }
+@keyframes hub-arrive { from { opacity:0; transform:scale(.8) translateY(12px); } to { opacity:1; transform:none; } }
+@media (prefers-reduced-motion:reduce) { .opening-sequence,.opening-sequence img { animation:none; transition:none; } }
 </style>
 </head>
 
 <body>
+<div id="openingSequence" class="opening-sequence" role="dialog" aria-label="Welcome to Local Hub">
+    <img src="LocalHubLogo.png" alt="">
+    <h2>LOCAL HUB</h2>
+    <button onclick="finishOpening(true)">Enter with sound</button>
+</div>
 
 <div class="background">
     <div class="glow one"></div>
@@ -2396,6 +2425,11 @@ body.music-panel-hidden.player-active .app { padding-bottom: 0; }
             class="group-filters">
         </div>
 
+        <div class="library-view-controls" aria-label="Library layout">
+            <button data-library-view="cards" onclick="setLibraryView('cards')" aria-pressed="false">☰ Cards</button>
+            <button data-library-view="icons" onclick="setLibraryView('icons')" aria-pressed="true">▦ App icons</button>
+        </div>
+        <p id="iconLibraryHint" style="font-size:12px;color:var(--muted)">Tap to launch. Hold an icon or right-click for edit, delete, and groups.</p>
         <div
             id="appGrid"
             class="app-grid">
@@ -3318,7 +3352,8 @@ function openGroupMenu(event, type, id) {
     const newGroupPlaceholder =
         isMusic ? "New playlist name" : "New group name";
 
-    const actionsHTML = !isMusic ? `
+const actionsHTML = !isMusic ? `
+        <button class="group-menu-item" onclick="closeGroupMenu(); toggleFavorite('${id}');">${record.favorite ? '★ Remove favorite' : '☆ Add favorite'}</button>
         <button
             class="group-menu-item"
             onclick="closeGroupMenu(); downloadApp('${id}');">
@@ -4186,6 +4221,11 @@ function renderApps() {
     }
 
 
+    // Stable sort keeps the selected ordering within each favorites partition.
+    filtered.sort((a,b) => Number(Boolean(b.favorite)) - Number(Boolean(a.favorite)));
+    grid.classList.toggle("icon-library", libraryView === "icons");
+    document.querySelectorAll('[data-library-view]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.libraryView === libraryView)));
+    document.getElementById('iconLibraryHint').hidden = libraryView !== 'icons';
     grid.innerHTML = "";
 
 
@@ -4231,6 +4271,7 @@ function renderApps() {
             <button
                 class="favorite
                 ${app.favorite ? "active" : ""}"
+                aria-label="${app.favorite ? 'Remove from favorites' : 'Add to favorites'}"
                 onclick="toggleFavorite('${app.id}')">
 
                 ${app.favorite ? "★" : "☆"}
@@ -4286,6 +4327,28 @@ function renderApps() {
         `;
 
 
+        if (libraryView === 'icons') {
+            card.tabIndex = 0;
+            card.setAttribute('role', 'button');
+            card.setAttribute('aria-label', `${app.name}. Enter to launch; Shift+F10 for actions.`);
+            let holdTimer, held = false, startX = 0, startY = 0;
+            const cancelHold = () => clearTimeout(holdTimer);
+            const menu = event => { held = true; openGroupMenu({stopPropagation(){}, currentTarget:card, target:card}, 'app', app.id); };
+            card.addEventListener('pointerdown', event => {
+                if (event.target.closest('button') || event.button !== 0) return;
+                held = false; startX = event.clientX; startY = event.clientY;
+                holdTimer = setTimeout(() => menu(event), 550);
+            });
+            card.addEventListener('pointermove', event => { if (Math.hypot(event.clientX-startX,event.clientY-startY)>10) cancelHold(); });
+            ['pointerup','pointercancel','pointerleave'].forEach(type => card.addEventListener(type,cancelHold));
+            card.addEventListener('click', event => { if (event.target.closest('button')) return; if (held) { event.stopPropagation(); held=false; return; } launchApp(app.id); });
+            card.addEventListener('contextmenu', event => { event.preventDefault(); cancelHold(); if (!held) menu(event); });
+            card.addEventListener('keydown', event => {
+                if(event.target !== card) return;
+                if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); launchApp(app.id); }
+                if(event.key === 'ContextMenu' || (event.shiftKey && event.key === 'F10')) { event.preventDefault(); menu(event); }
+            });
+        }
         grid.appendChild(card);
 
     });
@@ -7143,6 +7206,79 @@ async function importLocalHubData(event) {
    START
 ========================================== */
 
+let libraryView = localStorage.getItem('localHubLibraryView') || 'icons';
+function setLibraryView(mode) {
+    libraryView = mode === 'cards' ? 'cards' : 'icons';
+    localStorage.setItem('localHubLibraryView', libraryView);
+    renderApps();
+}
+
+// One vector vocabulary for static controls and controls rendered later.
+const HUB_ICON_PATHS = {
+    '⇧':'M12 17V3m-5 5 5-5 5 5M4 17v4h16v-4',
+    '⇆':'M3 7h18m-4-4 4 4-4 4M21 17H3m4-4-4 4 4 4',
+    '☰':'M4 6h16M4 12h16M4 18h16',
+    '▦':'M3 3h7v7H3ZM14 3h7v7h-7ZM3 14h7v7H3ZM14 14h7v7h-7Z',
+    '⚙':'M4 7h16M4 17h16M8 4v6M16 14v6',
+    '⇅':'M8 3v18m-4-4 4 4 4-4M16 21V3m-4 4 4-4 4 4',
+    '+':'M12 5v14M5 12h14', '＋':'M12 5v14M5 12h14',
+    '×':'M6 6l12 12M18 6 6 18', '✕':'M6 6l12 12M18 6 6 18',
+    '★':'m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9Z',
+    '☆':'m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9Z',
+    '▶':'m8 4 12 8-12 8Z', '⋯':'M5 12h.01M12 12h.01M19 12h.01',
+    '↓':'M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4',
+    '↑':'M12 17V3m-5 5 5-5 5 5M4 17v4h16v-4',
+    '✎':'m4 16 12-12 4 4L8 20H4Zm9-9 4 4',
+    '🗑':'M3 6h18M9 6V3h6v3M6 6l1 15h10l1-15M10 10v7M14 10v7',
+    '✓':'m5 12 4 4L19 6', '✔':'m5 12 4 4L19 6',
+    '⌕':'M10 3a7 7 0 1 0 0 14 7 7 0 0 0 0-14m5 12 6 6',
+    '♫':'M9 18V5l10-2v13M9 18a3 3 0 1 1-3-3 3 3 0 0 1 3 3m10-2a3 3 0 1 1-3-3 3 3 0 0 1 3 3',
+    '⤢':'M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5'
+};
+function normaliseButtonIcons() {
+    document.querySelectorAll('button').forEach(button => {
+        const walker = document.createTreeWalker(button, NodeFilter.SHOW_TEXT);
+        const nodes = [];
+        while (walker.nextNode()) if (!walker.currentNode.parentElement.closest('svg')) nodes.push(walker.currentNode);
+        nodes.forEach(node => {
+            const match = node.textContent.match(/^(\s*)(⇧|⇆|☰|▦|⚙|⇅|\+|＋|×|✕|★|☆|▶|⋯|↓|↑|✎|🗑|✓|✔|⌕|♫|⤢)\uFE0F?/u);
+            if (!match) return;
+            const label = button.getAttribute('aria-label') || button.getAttribute('title') || button.textContent.trim();
+            if (!button.hasAttribute('aria-label')) button.setAttribute('aria-label', label);
+            const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+            svg.setAttribute('class','hub-icon'); svg.setAttribute('viewBox','0 0 24 24'); svg.setAttribute('aria-hidden','true');
+            const path = document.createElementNS(svg.namespaceURI,'path'); path.setAttribute('d',HUB_ICON_PATHS[match[2]]); svg.appendChild(path);
+            node.before(svg); node.textContent = node.textContent.slice(match[0].length);
+        });
+    });
+}
+let openingFinished = false;
+function finishOpening(withSound = false) {
+    if (openingFinished) return;
+    openingFinished = true;
+    if (withSound) {
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            ctx.resume().then(() => {
+                [523.25,659.25,783.99].forEach((frequency,i) => {
+                    const tone = ctx.createOscillator(), gain = ctx.createGain(), start = ctx.currentTime+i*.11;
+                    tone.type='sine'; tone.frequency.value=frequency;
+                    gain.gain.setValueAtTime(0,start); gain.gain.linearRampToValueAtTime(.065,start+.025); gain.gain.exponentialRampToValueAtTime(.001,start+.45);
+                    tone.connect(gain); gain.connect(ctx.destination); tone.start(start); tone.stop(start+.5);
+                });
+                setTimeout(() => ctx.close(),1000);
+            }).catch(() => ctx.close());
+        } catch {}
+    }
+    const opening = document.getElementById('openingSequence');
+    opening.classList.add('leaving');
+    setTimeout(() => opening.remove(),400);
+}
+setTimeout(() => finishOpening(false),2400);
+normaliseButtonIcons();
+const buttonIconObserver = new MutationObserver(normaliseButtonIcons);
+buttonIconObserver.observe(document.body,{childList:true,subtree:true,characterData:true});
+
 loadAssistiveSettings();
 loadMusicPanelPreference();
 stabiliseMusicIcons();
@@ -7153,7 +7289,7 @@ loadMusic();
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
         navigator.serviceWorker
-            .register("./sw.js?v=25", { updateViaCache: "none" })
+            .register("./sw.js?v=26", { updateViaCache: "none" })
             .then(registration => registration.update())
             .catch(error => {
                 console.warn("Local Hub service worker was not registered:", error);
