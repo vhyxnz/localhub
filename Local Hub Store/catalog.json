@@ -14,23 +14,23 @@
     "id": "keyboard-warrior",
     "name": "Keyboard Warrior",
     "developer": "Local Hub Studio",
-    "version": "2.1.1",
+    "version": "2.6.0",
     "category": "Games",
     "description": "Put your typing speed and accuracy to the test.",
-    "icon": "Local Hub Store/icons/keyboard-warrior.png?v=2.1.1",
-    "packageUrl": "Local Hub Store/localhub-apps/keyboard-warrior.localhub-app?v=2.1.1",
-    "size": 7636769
+    "icon": "Local Hub Store/icons/keyboard-warrior.png?v=2.6.0",
+    "packageUrl": "Local Hub Store/localhub-apps/keyboard-warrior.localhub-app?v=2.6.0",
+    "size": 7842269
   },
   {
     "id": "medimap",
     "name": "MediMap",
     "developer": "Local Hub Studio",
-    "version": "1.4.0",
+    "version": "1.4.1",
     "category": "Tools",
     "description": "Find medicines quickly by name, category, gondola, or shelf and manage pharmacy inventory.",
-    "icon": "Local Hub Store/icons/medimap.png?v=1.4.0",
-    "packageUrl": "Local Hub Store/localhub-apps/medimap.localhub-app?v=1.4.0",
-    "size": 6874024
+    "icon": "Local Hub Store/icons/medimap.png?v=1.4.1",
+    "packageUrl": "Local Hub Store/localhub-apps/medimap.localhub-app?v=1.4.1",
+    "size": 6878276
   },
   {
     "id": "specter",
